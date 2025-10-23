@@ -11,7 +11,7 @@
 </head>
 <body>
 
-   <!-- ===== LOGIN PAGE ===== -->
+  <!-- ===== LOGIN PAGE ===== -->
   <div id="login-page" class="login-container">
     <div class="login-card">
       <h1 class="logo">KentBook</h1>
@@ -20,112 +20,125 @@
         <input type="password" id="password" placeholder="Password" required />
         <button type="submit">Log In</button>
       </form>
-      <p class="signup-link">Don't have an account? <a href="#">Create new account</a></p>
+
+      <p class="signup-link">
+        Don't have an account? <a href="#" id="showSignup">Create new account</a>
+      </p>
+
+      <!-- Sign-up form (hidden by default) -->
+      <div id="signupFormContainer" class="signup-container" style="display:none;">
+        <h2>Create New Account</h2>
+        <form id="signupForm">
+          <input type="text" id="newUsername" placeholder="Enter username" required />
+          <input type="email" id="newEmail" placeholder="Enter email" required />
+          <input type="password" id="newPassword" placeholder="Enter password" required />
+          <button type="submit">Sign Up</button>
+          <p class="login-return">Already have an account? <a href="#" id="backToLogin">Log in</a></p>
+        </form>
+      </div>
     </div>
   </div>
 
-  <!-- ===== TOP NAVBAR ===== -->
-  <header class="topbar">
-    <div class="left">
-      <div class="logo">kentbook</div>
-      <div class="search-wrapper">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#65676b" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.471 6.471 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
-        <input type="text" placeholder="Search KentBook" class="search" />
-      </div>
-    </div>
-
-   <div class="center-icons">
-  <button class="icon-btn icon-home active" title="Home">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M25 13L14 3 3 13h3v10h5V16h6v7h5V13h3z" fill="#65676b"/></svg>
-  </button>
-  <button class="icon-btn icon-friends" title="Friends">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M16 14a4 4 0 1 0-8 0c0 2.21 1.79 4 4 4s4-1.79 4-4zm-8 5c-3 0-6 1.34-6 4v2h20v-2c0-2.66-3-4-6-4H8zM22 13h2v-2h-2V9h-2v2h-2v2h2v2h2v-2z" fill="#65676b"/></svg>
-  </button>
-  <button class="icon-btn icon-watch" title="Watch">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M4 6h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm8 4v8l6-4-6-4z" fill="#65676b"/></svg>
-  </button>
-  <button class="icon-btn icon-messenger" title="Messenger">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M14 2C7.37 2 2 7.14 2 13.5c0 3.48 1.61 6.62 4.23 8.74v3.76l3.88-2.14a12.63 12.63 0 0 0 3.89.6c6.63 0 12-5.14 12-11.5S20.63 2 14 2zm.82 14.43-2.95-3.15-5.13 3.15 5.78-6.27 2.96 3.15 5.12-3.15-5.78 6.27z" fill="#65676b"/></svg>
-  </button>
-  <button class="icon-btn icon-notifications" title="Notifications">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M14 26a2 2 0 0 0 2-2H12a2 2 0 0 0 2 2zm8-6V13a8 8 0 1 0-16 0v7l-2 2v1h20v-1l-2-2z" fill="#65676b"/></svg>
-  </button>
-  <button class="icon-btn icon-menu" title="Menu">
-    <svg class="icon" viewBox="0 0 28 28"><path d="M4 7h20v2H4V7zm0 6h20v2H4v-2zm0 6h20v2H4v-2z" fill="#65676b"/></svg>
-  </button>
-</div>
-
-
-
-  </header>
-
-  <!-- ===== MAIN WRAPPER ===== -->
-  <main class="layout">
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar left-sidebar">
-      <div class="menu">
-        <p><strong>Menu</strong></p>
-        <ul>
-          <li>Friends</li>
-          <li>Watch</li>
-          <li>Events</li>
-          <li>Memories</li>
-        </ul>
-      </div>
-
-      <div class="shortcuts">
-        <p><strong>Shortcuts</strong></p>
-        <ul>
-          <li>Weekend Trips</li>
-          <li>Best Hiking Trails</li>
-        </ul>
-      </div>
-    </aside>
-
-    <!-- CENTER FEED -->
-    <section class="feed">
-      <div class="stories-row">
-        <div class="story add-story">
-          <img src="" alt="me">
-          <p>Create Story</p>
+  <!-- ===== MAIN APP (hidden by default) ===== -->
+  <div id="main-app" style="display:none;">
+    <!-- ===== TOP NAVBAR ===== -->
+    <header class="topbar">
+      <div class="left">
+        <div class="logo">kentbook</div>
+        <div class="search-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="#65676b" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.471 6.471 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+          </svg>
+          <input type="text" placeholder="Search KentBook" class="search" />
         </div>
-        <div class="story"><img src="images/logo.png"><p>Tom</p></div>
-        <div class="story"><img src=""><p>dodo</p></div>
-        <div class="story"><img src=""><p>kuya g</p></div>
-        <div class="story"><img src=""><p>partner</p></div>
-        <div class="story"><img src=""><p>wilan</p></div>
-        <div class="story"><img src=""><p>dodo</p></div>
-        <div class="story"><img src=""><p>kuya g</p></div>
-         <div class="story"><img src=""><p>partner</p></div>
+      </div>
+
+      <div class="center-icons">
+        <button class="icon-btn icon-home active" title="Home">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M25 13L14 3 3 13h3v10h5V16h6v7h5V13h3z" fill="#65676b"/></svg>
+        </button>
+        <button class="icon-btn icon-friends" title="Friends">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M16 14a4 4 0 1 0-8 0c0 2.21 1.79 4 4 4s4-1.79 4-4zm-8 5c-3 0-6 1.34-6 4v2h20v-2c0-2.66-3-4-6-4H8zM22 13h2v-2h-2V9h-2v2h-2v2h2v2h2v-2z" fill="#65676b"/></svg>
+        </button>
+        <button class="icon-btn icon-watch" title="Watch">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M4 6h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm8 4v8l6-4-6-4z" fill="#65676b"/></svg>
+        </button>
+        <button class="icon-btn icon-messenger" title="Messenger">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M14 2C7.37 2 2 7.14 2 13.5c0 3.48 1.61 6.62 4.23 8.74v3.76l3.88-2.14a12.63 12.63 0 0 0 3.89.6c6.63 0 12-5.14 12-11.5S20.63 2 14 2zm.82 14.43-2.95-3.15-5.13 3.15 5.78-6.27 2.96 3.15 5.12-3.15-5.78 6.27z" fill="#65676b"/></svg>
+        </button>
+        <button class="icon-btn icon-notifications" title="Notifications">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M14 26a2 2 0 0 0 2-2H12a2 2 0 0 0 2 2zm8-6V13a8 8 0 1 0-16 0v7l-2 2v1h20v-1l-2-2z" fill="#65676b"/></svg>
+        </button>
+        <button class="icon-btn icon-menu" title="Menu">
+          <svg class="icon" viewBox="0 0 28 28"><path d="M4 7h20v2H4V7zm0 6h20v2H4v-2zm0 6h20v2H4v-2z" fill="#65676b"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== MAIN WRAPPER ===== -->
+    <main class="layout">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar left-sidebar">
+        <div class="menu">
+          <p><strong>Menu</strong></p>
+          <ul>
+            <li>Friends</li>
+            <li>Watch</li>
+            <li>Events</li>
+            <li>Memories</li>
+          </ul>
+        </div>
+
+        <div class="shortcuts">
+          <p><strong>Shortcuts</strong></p>
+          <ul>
+            <li>Weekend Trips</li>
+            <li>Best Hiking Trails</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- CENTER FEED -->
+      <section class="feed">
+        <div class="stories-row">
+          <div class="story add-story">
+            <img src="" alt="me">
+            <p>Create Story</p>
+          </div>
+          <div class="story"><img src="images/logo.png"><p>Tom</p></div>
+          <div class="story"><img src=""><p>dodo</p></div>
+          <div class="story"><img src=""><p>kuya g</p></div>
+          <div class="story"><img src=""><p>partner</p></div>
           <div class="story"><img src=""><p>wilan</p></div>
-      </div>
-
-      <section id="composer"></section>
-      <section id="feed"></section>
-    </section>
-
-    <!-- RIGHT SIDEBAR -->
-    <aside class="sidebar right-sidebar">
-      <div class="profile-card">
-        <img src="" alt="user" class="avatar" />
-        <div>
-          <strong>Kent Wilan</strong>
-          <p>View Profile</p>
         </div>
-      </div>
 
-      <div class="contacts">
-        <p><strong>Contacts</strong></p>
-        <ul>
-          <li><span class="online-dot"></span> Alice</li>
-          <li><span class="online-dot"></span> Mark</li>
-          <li><span class="online-dot"></span> John</li>
-        </ul>
-      </div>
-    </aside>
-  </main>
+        <section id="composer"></section>
+        <section id="feed"></section>
+      </section>
 
-  <footer class="footer">KentBook &copy; 2025 — Inspired by Facebook</footer>
+      <!-- RIGHT SIDEBAR -->
+      <aside class="sidebar right-sidebar">
+        <div class="profile-card">
+          <img src="" alt="user" class="avatar" />
+          <div>
+            <strong>Kent Wilan</strong>
+            <p>View Profile</p>
+          </div>
+        </div>
+
+        <div class="contacts">
+          <p><strong>Contacts</strong></p>
+          <ul>
+            <li><span class="online-dot"></span> Alice</li>
+            <li><span class="online-dot"></span> Mark</li>
+            <li><span class="online-dot"></span> John</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">KentBook &copy; 2025 — Inspired by Facebook</footer>
+  </div> <!-- END MAIN APP WRAPPER -->
 
   <!-- Backbone scripts -->
   <script src="js/models.js"></script>
