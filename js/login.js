@@ -1,13 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.getElementById("loginForm");
   const loginPage = document.getElementById("login-page");
+  const mainApp = document.getElementById("main-app"); // ✅ Main wrapper
 
-  // App sections
-  const header = document.querySelector("header.topbar");
-  const mainLayout = document.querySelector("main.layout");
-  const footer = document.querySelector("footer.footer");
-
-  // Loader
+  // Create loading screen
   const loader = document.createElement("div");
   loader.className = "loading-screen";
   loader.innerHTML = `
@@ -17,23 +13,21 @@ document.addEventListener("DOMContentLoaded", function () {
   document.body.appendChild(loader);
   loader.style.display = "none";
 
-  // Retrieve users from localStorage or create default
+  // Retrieve saved users
   let users = JSON.parse(localStorage.getItem("kentbook_users")) || [
     { username: "kent", password: "12345", email: "kent@example.com" }
   ];
 
-  // === LOGIN FUNCTION ===
+  // === FUNCTION: Show main app after login ===
   function showApp() {
     loader.style.display = "flex";
     loginPage.style.display = "none";
 
     setTimeout(() => {
       loader.style.display = "none";
-      header.style.display = "flex";
-      mainLayout.style.display = "flex";
-      footer.style.display = "block";
+      mainApp.style.display = "block"; // ✅ FIXED: show wrapper instead of header/main/footer
 
-      // Always go to home route
+      // Navigate to home route
       if (window.App && App.router) {
         App.router.navigate("home", { trigger: true });
       } else {
@@ -42,10 +36,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 2000);
   }
 
-  // === LOGIN SUBMIT ===
+  // === LOGIN ===
   if (loginForm) {
     loginForm.addEventListener("submit", function (e) {
       e.preventDefault();
+
       const enteredUser = document.getElementById("username").value.trim();
       const enteredPass = document.getElementById("password").value.trim();
 
@@ -62,58 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // === SIGNUP FORM ===
-  const signupContainer = document.getElementById("signupFormContainer");
-  const signupForm = document.getElementById("signupForm");
-  const showSignupLink = document.getElementById("showSignup");
-  const backToLogin = document.getElementById("backToLogin");
-
-  if (showSignupLink) {
-    showSignupLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      document.querySelector(".login-card form").style.display = "none";
-      document.querySelector(".signup-link").style.display = "none";
-      signupContainer.style.display = "block";
-    });
-  }
-
-  if (backToLogin) {
-    backToLogin.addEventListener("click", function (e) {
-      e.preventDefault();
-      signupContainer.style.display = "none";
-      document.querySelector(".login-card form").style.display = "block";
-      document.querySelector(".signup-link").style.display = "block";
-    });
-  }
-
-  if (signupForm) {
-    signupForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const newUser = {
-        username: document.getElementById("newUsername").value.trim(),
-        email: document.getElementById("newEmail").value.trim(),
-        password: document.getElementById("newPassword").value.trim(),
-      };
-
-      // Check if username exists
-      const exists = users.some((u) => u.username === newUser.username);
-      if (exists) {
-        alert("Username already exists. Please choose another.");
-        return;
-      }
-
-      users.push(newUser);
-      localStorage.setItem("kentbook_users", JSON.stringify(users));
-
-      alert("Account created successfully! You can now log in.");
-      signupContainer.style.display = "none";
-      document.querySelector(".login-card form").style.display = "block";
-      document.querySelector(".signup-link").style.display = "block";
-    });
-  }
-
-  // Auto-login check
+  // Auto-login if already authenticated
   if (localStorage.getItem("kentbook_logged_in") === "true") {
     showApp();
   }

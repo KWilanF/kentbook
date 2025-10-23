@@ -319,44 +319,7 @@ body {
   font-weight: 600;
 }
 
-/* ===== SIGN UP FORM ===== */
-.signup-container {
-  background: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  text-align: center;
-  max-width: 320px;
-  margin: 0 auto;
-}
 
-.signup-container h2 {
-  color: var(--primary);
-  margin-bottom: 16px;
-}
-
-.signup-container input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.signup-container button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-  font-weight: bold;
-}
-
-.signup-container button:hover {
-  background: #145dbf;
-}
 
 .login-return {
   margin-top: 12px;
@@ -389,8 +352,8 @@ body {
 .loading-screen {
   position: fixed;
   inset: 0;
-  background: #fff; /* White background */
-  color: var(--primary); /* KentBook blue text */
+  background: #fff;
+  color: var(--primary);
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -398,14 +361,12 @@ body {
   font-family: "Segoe UI", Helvetica, Arial, sans-serif;
   z-index: 2000;
 }
-
 .loader-logo {
   font-size: 38px;
   font-weight: 700;
   color: var(--primary);
   margin-bottom: 20px;
 }
-
 .spinner {
   width: 48px;
   height: 48px;
@@ -414,11 +375,8 @@ body {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 
