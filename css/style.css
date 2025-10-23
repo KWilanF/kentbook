@@ -30,7 +30,7 @@ body {
   justify-content: space-between;
   padding: 6px 16px;
   border-bottom: 1px solid var(--border);
-  flex-wrap: wrap; /* allows wrapping on smaller screens */
+  flex-wrap: wrap;
 }
 
 .logo {
@@ -183,7 +183,6 @@ body {
   object-fit: cover;
 }
 
-/* Text inside image */
 .story p {
   position: absolute;
   bottom: 8px;
@@ -241,6 +240,83 @@ body {
   color: var(--muted);
   font-size: 13px;
   padding: 16px 0;
+}
+
+/* ===== LOGIN PAGE ===== */
+#login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg);
+  padding: 16px;
+}
+
+.login-card {
+  background: var(--card);
+  padding: 32px 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-card .logo {
+  color: var(--primary);
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+}
+
+.login-card input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-card button:hover {
+  background: #166fe5;
+}
+
+.signup-link {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.signup-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -324,6 +400,26 @@ body {
   .story p {
     font-size: 12px;
   }
+
+  /* Responsive login */
+  #login-page {
+    padding: 20px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 320px;
+    padding: 24px;
+  }
+
+  .login-card .logo {
+    font-size: 32px;
+  }
+
+  .login-card button {
+    font-size: 15px;
+    padding: 10px;
+  }
 }
 
 /* Small mobile (below 600px) */
@@ -345,5 +441,17 @@ body {
 
   .topbar {
     flex-direction: row;
+  }
+
+  .login-card {
+    padding: 20px;
+  }
+
+  .login-card .logo {
+    font-size: 28px;
+  }
+
+  .login-card input {
+    padding: 10px;
   }
 }
