@@ -319,6 +319,23 @@ body {
   font-weight: 600;
 }
 
+.logout-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 12px;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background: #145dbf;
+}
+
+
 /* ===== RESPONSIVE ===== */
 
 /* Tablet view */

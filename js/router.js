@@ -73,9 +73,28 @@
       this.appView.showStaticPage('Notifications', '<p>No new notifications at the moment.</p>');
     },
 
-    menu: function () {
-      this.appView.showStaticPage('Menu', '<p>Quick links and account settings.</p>');
-    },
+  menu: function () {
+  // Show menu static page with logout button
+  this.appView.showStaticPage(
+    "Menu",
+    `
+    <p>Quick links and account settings.</p>
+    <button id="logoutBtn" class="logout-btn">Log Out</button>
+    `
+  );
+
+  // Attach click event after render
+  setTimeout(() => {
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function () {
+        localStorage.removeItem("kentbook_logged_in"); // clear login state
+        location.reload(); // reload page → shows login screen again
+      });
+    }
+  }, 100);
+},
+
 
     profile: function () {
       this.appView.showProfile();
