@@ -40,28 +40,34 @@
       App.restore();
     }
 
-    // app view helpers (not a heavy MVC view but central controller)
-    App.appView = {
-      showFeed: function(){
-        $('#composer').show();
-        var composer = new App.ComposerView({collection: App.posts, user: App.users.get(1).toJSON()});
-        App.postsView = new App.PostsView({collection: App.posts, users: App.users});
-        App.postsView.render();
-      },
-      showProfile: function(){
-        $('#composer').hide();
-        $('#feed').html('<div class="card"><h3>Profile</h3><p>Name: '+App.users.get(1).get('name')+'</p><p>Email: '+App.users.get(1).get('email')+'</p></div>');
-      },
-      showSinglePost: function(post){
-        $('#composer').hide();
-        var v = new App.PostView({model:post, user: App.users.get(post.get('user_id')) ? App.users.get(post.get('user_id')).toJSON() : {name:'Guest'}});
-        $('#feed').html(v.render().el);
-      },
-      showAbout: function(){
-        $('#composer').hide();
-        $('#feed').html('<div class="card"><h3>About KentBook</h3><p>This mini project demonstrates Backbone.js core features (Models, Collections, Views, Router).</p></div>');
-      }
-    };
+   App.appView = {
+  showFeed: function(){
+    $('#composer').show();
+    var composer = new App.ComposerView({collection: App.posts, user: App.users.get(1).toJSON()});
+    App.postsView = new App.PostsView({collection: App.posts, users: App.users});
+    App.postsView.render();
+  },
+  showProfile: function(){
+    $('#composer').hide();
+    $('#feed').html('<div class="card"><h3>Profile</h3><p>Name: '+App.users.get(1).get('name')+'</p><p>Email: '+App.users.get(1).get('email')+'</p></div>');
+  },
+  showSinglePost: function(post){
+    $('#composer').hide();
+    var v = new App.PostView({model:post, user: App.users.get(post.get('user_id')) ? App.users.get(post.get('user_id')).toJSON() : {name:'Guest'}});
+    $('#feed').html(v.render().el);
+  },
+  showAbout: function(){
+    $('#composer').hide();
+    $('#feed').html('<div class="card"><h3>About KentBook</h3><p>This mini project demonstrates Backbone.js core features (Models, Collections, Views, Router).</p></div>');
+  },
+
+  // 🆕 Added helper for static route pages
+  showStaticPage: function(title, content) {
+    $('#composer').hide();
+    $('#feed').html('<div class="card"><h3>' + title + '</h3><div>' + content + '</div></div>');
+  }
+};
+
 
     // router
     App.router = new App.AppRouter({posts:App.posts, users:App.users, appView:App.appView});
