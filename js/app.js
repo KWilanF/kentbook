@@ -368,14 +368,66 @@
         }
       };
 
-      // router
-      App.router = new App.AppRouter({
-        posts: App.posts, 
-        users: App.users, 
-        comments: App.comments,
-        appView: App.appView
-      });
-      Backbone.history.start();
+      // FIX: Initialize router with delay to ensure DOM is ready
+      setTimeout(function() {
+        App.router = new App.AppRouter({
+          posts: App.posts, 
+          users: App.users, 
+          comments: App.comments,
+          appView: App.appView
+        });
+        
+        // Start Backbone history
+        Backbone.history.start();
+        
+        // Manually trigger home route if no hash
+        if (!window.location.hash || window.location.hash === '#') {
+          App.router.navigate('home', { trigger: true });
+        }
+      }, 200);
+
+      // FIX: Add manual icon binding as backup
+      setTimeout(function() {
+        // Manual icon binding for navbar
+        const routes = [
+          '.center-icons .icon-btn:nth-child(1)',
+          '.center-icons .icon-btn:nth-child(2)', 
+          '.center-icons .icon-btn:nth-child(3)',
+          '.center-icons .icon-btn:nth-child(4)',
+          '.center-icons .icon-btn:nth-child(5)'
+        ];
+        
+        const routeNames = ['home', 'friends', 'watch', 'marketplace', 'groups'];
+        
+        routes.forEach((selector, index) => {
+          const element = document.querySelector(selector);
+          if (element) {
+            // Remove any existing listeners and add new one
+            const newElement = element.cloneNode(true);
+            element.parentNode.replaceChild(newElement, element);
+            
+            newElement.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              // Update active state
+              document.querySelectorAll('.center-icons .icon-btn').forEach(btn => {
+                btn.classList.remove('active');
+              });
+              newElement.classList.add('active');
+              
+              // Navigate to route
+              if (App.router) {
+                App.router.navigate(routeNames[index], { trigger: true });
+              } else {
+                window.location.hash = routeNames[index];
+              }
+            });
+          }
+        });
+        
+        console.log('Manual icon binding completed');
+      }, 500);
 
       // save on window unload
       $(window).on('beforeunload', function(){ App.persist(); });
