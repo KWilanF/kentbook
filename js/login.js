@@ -71,11 +71,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      // Sanitize inputs (basic example)
+      const sanitizedUser = enteredUser.replace(/[<>]/g, '');
+      const sanitizedPass = enteredPass.replace(/[<>]/g, '');
+
       const foundUser = users.find(
-        (u) => u.username === enteredUser || u.email === enteredUser
+        (u) => u.username === sanitizedUser || u.email === sanitizedUser
       );
 
-      if (foundUser && foundUser.password === enteredPass) {
+      if (foundUser && foundUser.password === sanitizedPass) {
+        // Login successful
         localStorage.setItem("kentbook_logged_in", "true");
         localStorage.setItem("kentbook_current_user", foundUser.username);
         showApp();

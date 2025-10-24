@@ -60,14 +60,16 @@
     
     // Helper to validate image URLs
     isValidImageUrl: function(url) {
-      if(!url) return true; // Empty is valid (no image)
-      try {
-        new URL(url);
-        return url.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
-      } catch {
-        return false;
-      }
-    },
+  if(!url) return true; // Empty is valid (no image)
+  // Allow data URLs for uploaded images
+  if (url.startsWith('data:image/')) return true;
+  try {
+    new URL(url);
+    return url.match(/\.(jpeg|jpg|gif|png|webp)$/) != null || url.startsWith('data:image/');
+  } catch {
+    return false;
+  }
+},
     
     toggleLike: function(){
       const currentLikes = this.get('likes') || 0;

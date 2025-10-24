@@ -187,6 +187,7 @@
       this.collection = opts.collection;
       this.user = opts.user;
       this.imageFile = null;
+      this.imageUrl = null;
       this.render();
       this.setupTextareaAutoResize();
     },
@@ -220,65 +221,119 @@
       this.$('#image-upload').click();
     },
     
-    onImageSelect: function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        this.imageFile = file;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          this.$('.preview').html(`
-            <img src="${event.target.result}" alt="Preview" />
-            <button class="remove-preview">×</button>
-          `).show();
-          
-          // Add remove preview handler
-          this.$('.remove-preview').on('click', () => {
-            this.$('.preview').hide().empty();
-            this.imageFile = null;
-            this.$('#image-upload').val('');
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-    },
+onImageSelect: function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    // Revoke previous URL if exists
+    if (this.imageUrl) {
+      URL.revokeObjectURL(this.imageUrl);
+    }
     
-    publish: function(e){
-      e.preventDefault();
-      
-      var body = this.$('textarea').val().trim();
-      var attrs = { 
-        body: body, 
-        user_id: this.user.id || 1,
-        image: this.imageFile ? URL.createObjectURL(this.imageFile) : ''
-      };
-      
-      var post = new App.Post(attrs);
-      var validation = post.validate(post.attributes);
-      
-      if(validation){
-        alert(validation);
-        return;
-      }
-      
-      // Generate unique ID and set timestamp
-      post.set({
-        id: 'post_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        created_at: new Date().toISOString()
-      });
-      
-      this.collection.add(post);
-      App.persist();
-      
-      // Reset form
-      this.$('textarea').val('').trigger('input');
+    this.imageFile = file;
+    this.imageUrl = URL.createObjectURL(file);
+    
+    // Show preview with object URL for display
+    this.$('.preview').html(`
+      <img src="${this.imageUrl}" alt="Preview" style="max-width: 100%; border-radius: 8px;" />
+      <button class="remove-preview">×</button>
+    `).show();
+    
+    // Add remove preview handler
+    this.$('.remove-preview').on('click', () => {
       this.$('.preview').hide().empty();
       this.imageFile = null;
+      if (this.imageUrl) {
+        URL.revokeObjectURL(this.imageUrl);
+        this.imageUrl = null;
+      }
       this.$('#image-upload').val('');
-      
-      // Scroll to show new post
-      $('html, body').animate({
-        scrollTop: this.$el.offset().top - 100
-      }, 500);
+    });
+  }
+},
+    
+   publish: function(e){
+  e.preventDefault();
+  
+  var body = this.$('textarea').val().trim();
+  
+  // Check if body is empty before proceeding
+  if (!body || body.trim().length === 0) {
+    alert("Post body cannot be empty.");
+    return;
+  }
+  
+  var attrs = { 
+    body: body, 
+    user_id: this.user.id || 1,
+    image: '' // Don't use object URL for persistence
+  };
+  
+  // If we have an image file, we need to handle it differently
+  // For now, we'll just skip the image or convert it to data URL
+  if (this.imageFile) {
+    // Convert image to data URL for persistence
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      attrs.image = event.target.result;
+      this.createPost(attrs);
+    };
+    reader.readAsDataURL(this.imageFile);
+  } else {
+    this.createPost(attrs);
+  }
+},
+
+// Helper function to create the post
+createPost: function(attrs) {
+  var post = new App.Post(attrs);
+  var validation = post.validate(post.attributes);
+  
+  if(validation){
+    alert(validation);
+    return;
+  }
+  
+  // Generate unique ID and set timestamp
+  post.set({
+    id: 'post_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    created_at: new Date().toISOString(),
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    liked: false
+  });
+  
+  this.collection.add(post, { at: 0 }); // Add at beginning for newest first
+  App.persist();
+  
+  // Reset form
+  this.resetForm();
+  
+  // Scroll to show new post
+  $('html, body').animate({
+    scrollTop: $('#feed').offset().top - 100
+  }, 500);
+},
+
+// Reset form function
+resetForm: function() {
+  this.$('textarea').val('').trigger('input');
+  this.$('.preview').hide().empty();
+  this.imageFile = null;
+  if (this.imageUrl) {
+    URL.revokeObjectURL(this.imageUrl);
+    this.imageUrl = null;
+  }
+  this.$('#image-upload').val('');
+  this.$('.post-btn').prop('disabled', true);
+},
+    
+    // Clean up object URLs when view is removed
+    remove: function() {
+      if (this.imageUrl) {
+        URL.revokeObjectURL(this.imageUrl);
+      }
+      return Backbone.View.prototype.remove.call(this);
     },
     
     render: function(){

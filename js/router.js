@@ -11,7 +11,8 @@
       'groups': 'groups',
       'profile': 'profile',
       'about': 'about',
-      'post/:id': 'singlePost'
+      'post/:id': 'singlePost',
+      'menu': 'menu'
     },
 
     initialize: function (options) {
@@ -22,6 +23,7 @@
       this.bindIconNavigation();
       this.bindSidebarNavigation();
       this.setupTopbarLogout();
+      this.bindDropdownNavigation();
     },
 
     // 🔗 Bind topbar icon clicks to routes
@@ -44,15 +46,6 @@
           });
         }
       });
-
-      // Bind menu button
-      const menuBtn = document.querySelector('.menu-btn');
-      if (menuBtn) {
-        menuBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.navigate('menu', { trigger: true });
-        });
-      }
     },
 
     // 🔗 Bind sidebar navigation
@@ -87,6 +80,24 @@
       });
     },
 
+    // Bind dropdown menu navigation
+    bindDropdownNavigation: function() {
+      const dropdownItems = document.querySelectorAll('.dropdown-item[data-route]');
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const route = item.getAttribute('data-route');
+          this.navigate(route, { trigger: true });
+          this.setActiveIcon(null);
+          // Hide dropdown after selection
+          const dropdownMenu = document.querySelector('.dropdown-menu');
+          if (dropdownMenu) {
+            dropdownMenu.style.display = 'none';
+          }
+        });
+      });
+    },
+
     // Setup topbar logout dropdown
     setupTopbarLogout: function() {
       const menuBtn = document.querySelector('.menu-btn');
@@ -104,9 +115,10 @@
         });
         
         // Logout handler
-        const logoutItem = dropdownMenu.querySelector('.dropdown-item');
+        const logoutItem = dropdownMenu.querySelector('.logout-btn');
         if (logoutItem) {
-          logoutItem.addEventListener('click', () => {
+          logoutItem.addEventListener('click', (e) => {
+            e.preventDefault();
             this.logout();
           });
         }
@@ -135,6 +147,12 @@
       const loginForm = document.getElementById("loginForm");
       if (loginForm) {
         loginForm.reset();
+      }
+
+      // Hide dropdown if open
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.style.display = 'none';
       }
     },
 
@@ -280,10 +298,16 @@
     },
 
     singlePost: function (id) {
-      const post = this.posts.get(id);
-      if (post) {
-        this.appView.showSinglePost(post);
-      } else {
+      try {
+        const post = this.posts.get(id);
+        if (post) {
+          this.appView.showSinglePost(post);
+        } else {
+          console.warn('Post not found:', id);
+          this.navigate('home', { trigger: true });
+        }
+      } catch (error) {
+        console.error('Error loading post:', error);
         this.navigate('home', { trigger: true });
       }
       this.setActiveIcon(null); // Clear topbar active state
