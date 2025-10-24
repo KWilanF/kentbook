@@ -31,7 +31,7 @@
       // sample seed if empty
       if(!(localStorage.getItem('kentbook_seeded'))){
         App.users.add([
-          {id:1,name:'Kent Wilan',email:'kent@example.com',avatar:'https://randomuser.me/api/portraits/men/32.jpg'},
+        {id:1,name:'Kent Wilan',email:'kent@example.com',avatar:'images/profile.png'},
           {id:2,name:'Alice Cooper',email:'alice@example.com',avatar:'https://randomuser.me/api/portraits/women/33.jpg'},
           {id:3,name:'Mark Wilson',email:'mark@example.com',avatar:'https://randomuser.me/api/portraits/men/45.jpg'},
           {id:4,name:'Sarah Johnson',email:'sarah@example.com',avatar:'https://randomuser.me/api/portraits/women/44.jpg'},

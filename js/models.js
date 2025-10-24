@@ -15,7 +15,7 @@
     toDisplay: function() {
       return {
         name: this.get('name'),
-        avatar: this.get('avatar') || 'https://randomuser.me/api/portraits/men/0.jpg',
+        avatar: this.get('avatar') || 'images/profile.png',
         email: this.get('email'),
         isOnline: this.get('isOnline')
       };
