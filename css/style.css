@@ -36,7 +36,7 @@ body {
   padding: 12px 0;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1000; /* Increased for dropdown */
 }
 
 .logo-container {
@@ -136,7 +136,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 8px 16px var(--shadow);
   padding: 8px;
-  z-index: 10001;
+  z-index: 10001; /* Higher than header */
   margin-top: 8px;
   animation: fadeIn 0.2s ease-in-out;
   overflow: hidden;
@@ -256,8 +256,8 @@ body {
 /* ===== TOP NAVBAR ===== */
 .topbar {
   position: sticky;
-  top: 69px;
-  z-index: 999;
+  top: 69px; /* Height of app-header */
+  z-index: 999; /* Lower than header */
   background: var(--card);
   display: flex;
   align-items: center;
@@ -361,7 +361,7 @@ body {
   flex: 0.25;
   min-width: 280px;
   position: sticky;
-  top: 129px;
+  top: 129px; /* Height of app-header + topbar */
   height: calc(100vh - 145px);
   overflow-y: auto;
   padding-right: 8px;
@@ -674,107 +674,11 @@ body {
   border: 1px solid var(--border);
 }
 
-/* ===== POST MENU DROPDOWN ===== */
 .card.post .meta {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-}
-
-.post-menu-container {
-  position: relative;
-  margin-left: auto;
-}
-
-.post-menu-btn {
-  background: none;
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--muted);
-  transition: background 0.2s;
-}
-
-.post-menu-btn:hover {
-  background: var(--hover);
-  color: var(--text);
-}
-
-.post-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 8px 16px var(--shadow);
-  padding: 8px;
-  z-index: 1000;
-  min-width: 180px;
-  display: none;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-.post-dropdown-menu.active {
-  display: block;
-}
-
-.post-dropdown-menu::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  right: 12px;
-  width: 16px;
-  height: 16px;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
-  transform: rotate(45deg);
-  z-index: -1;
-}
-
-.post-dropdown-menu .dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-size: 15px;
-  color: var(--text);
-  text-decoration: none;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.post-dropdown-menu .dropdown-item:hover {
-  background: var(--hover);
-}
-
-.post-dropdown-menu .delete-post {
-  color: #f02849;
-}
-
-.post-dropdown-menu .delete-post:hover {
-  background: rgba(240, 40, 73, 0.1);
-}
-
-.post-dropdown-menu .dropdown-icon {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .card.post .meta img.avatar {
@@ -879,269 +783,6 @@ body {
   justify-content: center;
   color: white;
   font-size: 12px;
-}
-
-/* ===== COMMENTS SECTION ===== */
-.comments-section {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--divider);
-}
-
-.comments-list {
-  margin-bottom: 16px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.comment-item {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.comment-item:hover {
-  background: var(--hover);
-}
-
-.comment-item .comment-avatar {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.comment-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.comment-author {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--text);
-}
-
-.comment-time {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.comment-body {
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--text);
-  margin-bottom: 4px;
-  word-wrap: break-word;
-}
-
-.comment-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-}
-
-.comment-like {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.comment-like:hover {
-  background: var(--hover);
-  color: var(--primary);
-}
-
-.comment-liked {
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.comment-likes-count {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.no-comments {
-  text-align: center;
-  color: var(--muted);
-  font-size: 14px;
-  padding: 20px;
-  font-style: italic;
-}
-
-/* ===== COMMENT MENU DROPDOWN ===== */
-.comment-menu-container {
-  position: relative;
-  margin-left: auto;
-}
-
-.comment-menu-btn {
-  background: none;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: bold;
-  transition: background 0.2s;
-}
-
-.comment-menu-btn:hover {
-  background: var(--hover);
-  color: var(--text);
-}
-
-.comment-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 8px 16px var(--shadow);
-  padding: 8px;
-  z-index: 1000;
-  min-width: 150px;
-  display: none;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-.comment-dropdown-menu.active {
-  display: block;
-}
-
-.comment-dropdown-menu::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  right: 8px;
-  width: 16px;
-  height: 16px;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
-  transform: rotate(45deg);
-  z-index: -1;
-}
-
-.comment-dropdown-menu .dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-size: 13px;
-  color: var(--text);
-  text-decoration: none;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.comment-dropdown-menu .dropdown-item:hover {
-  background: var(--hover);
-}
-
-.comment-dropdown-menu .delete-comment {
-  color: #f02849;
-}
-
-.comment-dropdown-menu .delete-comment:hover {
-  background: rgba(240, 40, 73, 0.1);
-}
-
-.comment-dropdown-menu .dropdown-icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Comment Composer */
-.comment-composer {
-  margin-top: 12px;
-}
-
-.comment-input-container {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.comment-input-wrapper {
-  flex: 1;
-  position: relative;
-}
-
-.comment-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 8px 12px;
-  font-size: 14px;
-  outline: none;
-  background: var(--bg);
-  transition: border-color 0.2s;
-  font-family: "Segoe UI", sans-serif;
-}
-
-.comment-input:focus {
-  border-color: var(--primary);
-  background: var(--card);
-}
-
-.comment-input-wrapper .comment-actions {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: none;
-}
-
-.comment-input:focus ~ .comment-actions {
-  display: block;
-}
-
-.comment-submit {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.comment-submit:hover {
-  background: var(--primary-dark);
 }
 
 /* PROFILE CARD */
@@ -1474,7 +1115,7 @@ body {
   .topbar {
     padding: 0 12px;
     height: 56px;
-    top: 49px;
+    top: 49px; /* Adjusted for smaller app-header */
   }
   
   .search {
@@ -1548,38 +1189,6 @@ body {
     right: auto;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);
-  }
-
-  /* Post dropdown mobile */
-  .post-dropdown-menu {
-    position: fixed;
-    top: auto;
-    right: 8px;
-    left: 8px;
-    bottom: 8px;
-    max-width: none;
-    width: auto;
-    margin-top: 0;
-    min-width: auto;
-  }
-  
-  .post-dropdown-menu::before {
-    display: none;
-  }
-
-  /* Comment dropdown mobile */
-  .comment-dropdown-menu {
-    position: fixed;
-    top: auto;
-    right: 8px;
-    left: 8px;
-    bottom: 8px;
-    max-width: none;
-    width: auto;
-  }
-  
-  .comment-dropdown-menu::before {
-    display: none;
   }
 
   /* Show full sidebar content in dropdown on mobile */
@@ -1681,19 +1290,6 @@ body {
     color: white;
     background-color: red;
   }
-  
-  .comments-list {
-    max-height: 300px;
-  }
-  
-  .comment-input-container {
-    gap: 6px;
-  }
-  
-  .comment-item .comment-avatar {
-    width: 28px;
-    height: 28px;
-  }
 }
 
 /* Small mobile (below 600px) */
@@ -1708,7 +1304,7 @@ body {
   
   .topbar {
     padding: 0 8px;
-    top: 47px;
+    top: 47px; /* Adjusted for smaller app-header */
   }
   
   .center-icons .icon-btn {
@@ -1764,28 +1360,6 @@ body {
     max-height: 75vh;
   }
   
-  .post-menu-btn {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .post-dropdown-menu {
-    right: 4px;
-    left: 4px;
-    bottom: 4px;
-  }
-  
-  .comment-menu-btn {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .comment-dropdown-menu {
-    right: 4px;
-    left: 4px;
-    bottom: 4px;
-  }
-  
   .login-info h1 {
     font-size: 36px;
   }
@@ -1806,18 +1380,5 @@ body {
   .login-card button {
     font-size: 18px;
     height: 44px;
-  }
-  
-  .comments-list {
-    max-height: 250px;
-  }
-  
-  .comment-body {
-    font-size: 13px;
-  }
-  
-  .comment-input {
-    font-size: 13px;
-    padding: 6px 10px;
   }
 }
