@@ -258,7 +258,7 @@ onImageSelect: function(e) {
   
   // Check if body is empty before proceeding
   if (!body || body.trim().length === 0) {
-    alert("Post body cannot be empty.");
+    
     return;
   }
   
