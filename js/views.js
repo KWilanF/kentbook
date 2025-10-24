@@ -1,7 +1,7 @@
 (function(){
   window.App = window.App || {};
 
-  App.PostView = Backbone.View.extend({
+ App.PostView = Backbone.View.extend({
     tagName: 'article',
     className: 'card post',
     
@@ -15,6 +15,21 @@
             <svg class="public-icon" viewBox="0 0 16 16" fill="#65676b">
               <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13A6 6 0 1 1 8 2a6 6 0 0 1 0 12zm.5-9.5h-1v5h1v-5zm0 6.5h-1v1h1v-1z"/>
             </svg>
+          </div>
+        </div>
+        <div class="post-menu-container">
+          <button class="post-menu-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+          </button>
+          <div class="post-dropdown-menu">
+            <button class="dropdown-item delete-post">
+              <svg class="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+              Delete Post
+            </button>
           </div>
         </div>
       </div>
@@ -54,13 +69,48 @@
     events: {
       'click .like': 'onLike',
       'click .comment': 'onComment',
-      'click .share': 'onShare'
+      'click .share': 'onShare',
+      'click .post-menu-btn': 'onMenuClick',
+      'click .delete-post': 'onDeletePost'
     },
     
     initialize: function(opts){
       this.user = opts.user;
       this.listenTo(this.model, 'change', this.render);
       this.listenTo(this.model, 'destroy', this.remove);
+      
+      // Close dropdown when clicking elsewhere
+      $(document).on('click', this.onDocumentClick.bind(this));
+    },
+    
+    onMenuClick: function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Close all other dropdowns
+      $('.post-dropdown-menu').removeClass('active');
+      
+      // Toggle this dropdown
+      this.$('.post-dropdown-menu').toggleClass('active');
+    },
+    
+    onDocumentClick: function(e){
+      if (!this.$el.find(e.target).length) {
+        this.$('.post-dropdown-menu').removeClass('active');
+      }
+    },
+    
+    onDeletePost: function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (confirm('Are you sure you want to delete this post?')) {
+        this.model.destroy();
+        App.persist();
+      }
+      
+      // Close dropdown
+      this.$('.post-dropdown-menu').removeClass('active');
     },
     
     onLike: function(e){
@@ -80,6 +130,12 @@
       this.model.addShare();
       alert('Shared post!');
       App.persist();
+    },
+    
+    remove: function() {
+      // Clean up document event listener
+      $(document).off('click', this.onDocumentClick);
+      return Backbone.View.prototype.remove.call(this);
     },
     
     render: function(){

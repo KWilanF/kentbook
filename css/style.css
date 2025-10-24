@@ -674,11 +674,107 @@ body {
   border: 1px solid var(--border);
 }
 
+/* ===== POST MENU DROPDOWN ===== */
 .card.post .meta {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.post-menu-container {
+  position: relative;
+  margin-left: auto;
+}
+
+.post-menu-btn {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  transition: background 0.2s;
+}
+
+.post-menu-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.post-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 16px var(--shadow);
+  padding: 8px;
+  z-index: 1000;
+  min-width: 180px;
+  display: none;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.post-dropdown-menu.active {
+  display: block;
+}
+
+.post-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.post-dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 15px;
+  color: var(--text);
+  text-decoration: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.post-dropdown-menu .dropdown-item:hover {
+  background: var(--hover);
+}
+
+.post-dropdown-menu .delete-post {
+  color: #f02849;
+}
+
+.post-dropdown-menu .delete-post:hover {
+  background: rgba(240, 40, 73, 0.1);
+}
+
+.post-dropdown-menu .dropdown-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card.post .meta img.avatar {
@@ -1256,6 +1352,22 @@ body {
     justify-content: center;
   }
   
+.post-dropdown-menu {
+    position: fixed;
+    top: auto;
+    right: 8px;
+    left: 8px;
+    bottom: 8px;
+    max-width: none;
+    width: auto;
+    margin-top: 0;
+    min-width: auto;
+  }
+  
+  .post-dropdown-menu::before {
+    display: none;
+  }
+  
   /* Mobile login */
   .login-container {
     flex-direction: column;
@@ -1358,6 +1470,17 @@ body {
     left: 4px;
     top: 55px;
     max-height: 75vh;
+  }
+  
+.post-menu-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .post-dropdown-menu {
+    right: 4px;
+    left: 4px;
+    bottom: 4px;
   }
   
   .login-info h1 {
