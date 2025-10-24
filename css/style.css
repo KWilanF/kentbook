@@ -589,6 +589,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
+  margin-top: -50px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -616,7 +617,10 @@ body {
   color: #fff;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 5px;
+  margin-top: 50px;
+  margin-right: 70px;
+  margin-left: -60px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
