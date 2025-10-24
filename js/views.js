@@ -76,6 +76,7 @@
     
     initialize: function(opts){
       this.user = opts.user;
+      this.collection = opts.collection; // Store reference to the collection
       this.listenTo(this.model, 'change', this.render);
       this.listenTo(this.model, 'destroy', this.remove);
       
@@ -105,8 +106,15 @@
       e.stopPropagation();
       
       if (confirm('Are you sure you want to delete this post?')) {
+        // Remove from collection first, then destroy the model
+        if (this.collection) {
+          this.collection.remove(this.model);
+        }
         this.model.destroy();
         App.persist();
+        
+        // Remove the view from DOM
+        this.remove();
       }
       
       // Close dropdown
@@ -162,6 +170,7 @@
     
     initialize: function(opts){
       this.users = opts.users;
+      this.collection = opts.collection; // Store the collection reference
       this.listenTo(this.collection, 'add remove reset change', this.render);
     },
     
@@ -188,7 +197,8 @@
         
         var v = new App.PostView({
           model: post, 
-          user: userData
+          user: userData,
+          collection: this.collection // Pass collection to PostView
         });
         this.$el.append(v.render().el);
       }, this);
