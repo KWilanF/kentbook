@@ -1,7 +1,7 @@
 (function(){
   window.App = window.App || {};
 
- App.PostView = Backbone.View.extend({
+  App.PostView = Backbone.View.extend({
     tagName: 'article',
     className: 'card post',
     
@@ -64,24 +64,55 @@
           Share
         </button>
       </div>
+      
+      <!-- Comments Section -->
+      <div class="comments-section" style="display: none;">
+        <div class="comments-list"></div>
+        <div class="comment-composer">
+          <div class="comment-input-container">
+            <img src="<%= currentUser.avatar %>" alt="<%= currentUser.name %>" class="avatar comment-avatar" />
+            <div class="comment-input-wrapper">
+              <input type="text" class="comment-input" placeholder="Write a comment..." />
+              <div class="comment-actions">
+                <button class="comment-submit">Post</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     `),
     
     events: {
       'click .like': 'onLike',
-      'click .comment': 'onComment',
+      'click .comment': 'onCommentToggle',
       'click .share': 'onShare',
       'click .post-menu-btn': 'onMenuClick',
-      'click .delete-post': 'onDeletePost'
+      'click .delete-post': 'onDeletePost',
+      'click .comment-submit': 'onCommentSubmit',
+      'keypress .comment-input': 'onCommentKeypress',
+      'click .comment-like': 'onCommentLike',
+      'click .delete-comment': 'onDeleteComment',
+      'click .comment-menu-btn': 'onCommentMenuClick'
     },
     
     initialize: function(opts){
       this.user = opts.user;
-      this.collection = opts.collection; // Store reference to the collection
+      this.currentUser = opts.currentUser;
+      this.comments = opts.comments;
       this.listenTo(this.model, 'change', this.render);
       this.listenTo(this.model, 'destroy', this.remove);
+      this.listenTo(this.comments, 'add', this.onCommentAdded);
+      this.listenTo(this.comments, 'remove', this.renderComments);
       
       // Close dropdown when clicking elsewhere
-      $(document).on('click', this.onDocumentClick.bind(this));
+      $(document).on('click.postview', this.onDocumentClick.bind(this));
+    },
+    
+    onCommentAdded: function(comment) {
+      // Only re-render comments if the comment belongs to this post
+      if (comment.get('post_id') === this.model.id) {
+        this.renderComments();
+      }
     },
     
     onMenuClick: function(e){
@@ -90,14 +121,32 @@
       
       // Close all other dropdowns
       $('.post-dropdown-menu').removeClass('active');
+      $('.comment-dropdown-menu').removeClass('active');
       
       // Toggle this dropdown
       this.$('.post-dropdown-menu').toggleClass('active');
     },
     
+    onCommentMenuClick: function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const $target = $(e.currentTarget);
+      const $commentItem = $target.closest('.comment-item');
+      const $dropdown = $commentItem.find('.comment-dropdown-menu');
+      
+      // Close all other dropdowns
+      $('.post-dropdown-menu').removeClass('active');
+      $('.comment-dropdown-menu').removeClass('active');
+      
+      // Toggle this dropdown
+      $dropdown.toggleClass('active');
+    },
+    
     onDocumentClick: function(e){
       if (!this.$el.find(e.target).length) {
         this.$('.post-dropdown-menu').removeClass('active');
+        $('.comment-dropdown-menu').removeClass('active');
       }
     },
     
@@ -106,11 +155,10 @@
       e.stopPropagation();
       
       if (confirm('Are you sure you want to delete this post?')) {
-        // Remove from collection first, then destroy the model
-        if (this.collection) {
-          this.collection.remove(this.model);
-        }
-        this.model.destroy();
+        // Remove all comments for this post first
+        this.comments.removeForPost(this.model.id);
+        // Remove the post from collection
+        App.posts.remove(this.model);
         App.persist();
         
         // Remove the view from DOM
@@ -127,22 +175,164 @@
       App.persist();
     },
     
-    onComment: function(e){
+    onCommentToggle: function(e){
       e.preventDefault();
-      alert('Comment functionality would go here!');
-      // In a real app, this would open a comment composer
+      const $commentsSection = this.$('.comments-section');
+      const isVisible = $commentsSection.is(':visible');
+      
+      if (isVisible) {
+        $commentsSection.slideUp();
+      } else {
+        $commentsSection.slideDown();
+        this.renderComments();
+        this.$('.comment-input').focus();
+      }
+    },
+    
+    onCommentSubmit: function(e){
+      e.preventDefault();
+      this.submitComment();
+    },
+    
+    onCommentKeypress: function(e){
+      if (e.which === 13) { // Enter key
+        e.preventDefault();
+        this.submitComment();
+      }
+    },
+    
+    onCommentLike: function(e){
+      e.preventDefault();
+      const $target = $(e.currentTarget);
+      const commentId = $target.closest('.comment-item').data('comment-id');
+      const comment = this.comments.get(commentId);
+      
+      if (comment) {
+        comment.toggleLike();
+        App.persist();
+        this.renderComments();
+      }
+    },
+    
+    onDeleteComment: function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const $target = $(e.currentTarget);
+      const commentId = $target.closest('.comment-item').data('comment-id');
+      const comment = this.comments.get(commentId);
+      
+      if (comment && confirm('Are you sure you want to delete this comment?')) {
+        // Remove comment from collection
+        this.comments.remove(comment);
+        // Decrement post comment count
+        this.model.set('comments', Math.max(0, (this.model.get('comments') || 0) - 1));
+        App.persist();
+        this.renderComments(); // Refresh comments display
+      }
+      
+      // Close dropdown
+      $('.comment-dropdown-menu').removeClass('active');
+    },
+    
+    submitComment: function(){
+      const commentText = this.$('.comment-input').val().trim();
+      
+      if (!commentText) return;
+      
+      const comment = new App.Comment({
+        id: 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        post_id: this.model.id,
+        user_id: this.currentUser.id,
+        body: commentText,
+        created_at: new Date().toISOString(),
+        likes: 0,
+        liked: false
+      });
+      
+      // Add comment to collection
+      this.comments.add(comment);
+      
+      // Update post comment count
+      this.model.set('comments', (this.model.get('comments') || 0) + 1);
+      
+      // Clear input
+      this.$('.comment-input').val('');
+      
+      // Persist data
+      App.persist();
+      
+      // The comment will automatically show because of the 'add' event listener
+      // No need to call renderComments() here - it's handled by onCommentAdded
+    },
+    
+    renderComments: function(){
+      const $commentsList = this.$('.comments-list');
+      $commentsList.empty();
+      
+      // Use the collection's forPost method
+      const postComments = this.comments.forPost(this.model.id);
+      
+      if (postComments.length === 0) {
+        $commentsList.html('<div class="no-comments">No comments yet. Be the first to comment!</div>');
+        return;
+      }
+      
+      postComments.forEach((comment) => {
+        const commentUser = window.App.users.get(comment.get('user_id'));
+        const userData = commentUser ? commentUser.toDisplay() : { 
+          name: 'Guest', 
+          avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
+        };
+        
+        const isCurrentUserComment = comment.get('user_id') === this.currentUser.id;
+        
+        const commentEl = $(`
+          <div class="comment-item" data-comment-id="${comment.id}">
+            <img src="${userData.avatar}" alt="${userData.name}" class="avatar comment-avatar" />
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">${_.escape(userData.name)}</span>
+                <span class="comment-time">${comment.getTimeAgo ? comment.getTimeAgo() : 'Just now'}</span>
+              </div>
+              <div class="comment-body">${_.escape(comment.get('body'))}</div>
+              <div class="comment-actions">
+                <button class="comment-like ${comment.get('liked') ? 'comment-liked' : ''}">
+                  ${comment.get('liked') ? 'Liked' : 'Like'}
+                </button>
+                <span class="comment-likes-count">${comment.get('likes') || 0}</span>
+                ${isCurrentUserComment ? `
+                  <div class="comment-menu-container">
+                    <button class="comment-menu-btn">···</button>
+                    <div class="comment-dropdown-menu">
+                      <button class="dropdown-item delete-comment">
+                        <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                        Delete Comment
+                      </button>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `);
+        
+        $commentsList.append(commentEl);
+      });
     },
     
     onShare: function(e){
       e.preventDefault();
-      this.model.addShare();
+      this.model.set('shares', (this.model.get('shares') || 0) + 1);
       alert('Shared post!');
       App.persist();
     },
     
     remove: function() {
       // Clean up document event listener
-      $(document).off('click', this.onDocumentClick);
+      $(document).off('click.postview');
       return Backbone.View.prototype.remove.call(this);
     },
     
@@ -158,8 +348,11 @@
         likes: this.model.get('likes') || 0,
         comments: this.model.get('comments') || 0,
         shares: this.model.get('shares') || 0,
-        liked: this.model.get('liked') || false
+        liked: this.model.get('liked') || false,
+        currentUser: this.currentUser
       }));
+      
+      this.renderComments();
       
       return this;
     }
@@ -170,12 +363,33 @@
     
     initialize: function(opts){
       this.users = opts.users;
-      this.collection = opts.collection; // Store the collection reference
-      this.listenTo(this.collection, 'add remove reset change', this.render);
+      this.currentUser = opts.currentUser;
+      this.comments = opts.comments;
+      this.listenTo(this.collection, 'add', this.addPost);
+      this.listenTo(this.collection, 'remove', this.render);
+      this.listenTo(this.collection, 'reset', this.render);
+    },
+    
+    addPost: function(post) {
+      var user = this.users.get(post.get('user_id'));
+      var userData = user ? user.toDisplay() : { 
+        name: 'Guest', 
+        avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
+      };
+      
+      var v = new App.PostView({
+        model: post, 
+        user: userData,
+        currentUser: this.currentUser,
+        comments: this.comments
+      });
+      
+      // Add new post at the top
+      this.$el.prepend(v.render().el);
     },
     
     render: function(){
-      this.$el.html('');
+      this.$el.empty();
       
       if(this.collection.length === 0){
         this.$el.html(
@@ -190,7 +404,7 @@
       
       this.collection.each(function(post){
         var user = this.users.get(post.get('user_id'));
-        var userData = user ? user.toDisplay ? user.toDisplay() : user.toJSON() : { 
+        var userData = user ? user.toDisplay() : { 
           name: 'Guest', 
           avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
         };
@@ -198,7 +412,8 @@
         var v = new App.PostView({
           model: post, 
           user: userData,
-          collection: this.collection // Pass collection to PostView
+          currentUser: this.currentUser,
+          comments: this.comments
         });
         this.$el.append(v.render().el);
       }, this);
@@ -287,112 +502,107 @@
       this.$('#image-upload').click();
     },
     
-onImageSelect: function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    // Revoke previous URL if exists
-    if (this.imageUrl) {
-      URL.revokeObjectURL(this.imageUrl);
-    }
+    onImageSelect: function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Revoke previous URL if exists
+        if (this.imageUrl) {
+          URL.revokeObjectURL(this.imageUrl);
+        }
+        
+        this.imageFile = file;
+        this.imageUrl = URL.createObjectURL(file);
+        
+        // Show preview with object URL for display
+        this.$('.preview').html(`
+          <img src="${this.imageUrl}" alt="Preview" style="max-width: 100%; border-radius: 8px;" />
+          <button class="remove-preview">×</button>
+        `).show();
+        
+        // Add remove preview handler
+        this.$('.remove-preview').on('click', () => {
+          this.$('.preview').hide().empty();
+          this.imageFile = null;
+          if (this.imageUrl) {
+            URL.revokeObjectURL(this.imageUrl);
+            this.imageUrl = null;
+          }
+          this.$('#image-upload').val('');
+        });
+      }
+    },
     
-    this.imageFile = file;
-    this.imageUrl = URL.createObjectURL(file);
-    
-    // Show preview with object URL for display
-    this.$('.preview').html(`
-      <img src="${this.imageUrl}" alt="Preview" style="max-width: 100%; border-radius: 8px;" />
-      <button class="remove-preview">×</button>
-    `).show();
-    
-    // Add remove preview handler
-    this.$('.remove-preview').on('click', () => {
+    publish: function(e){
+      e.preventDefault();
+      
+      var body = this.$('textarea').val().trim();
+      
+      // Check if body is empty before proceeding
+      if (!body || body.trim().length === 0) {
+        return;
+      }
+      
+      var attrs = { 
+        body: body, 
+        user_id: this.user.id || 1,
+        image: '' // Don't use object URL for persistence
+      };
+      
+      // If we have an image file, convert it to data URL
+      if (this.imageFile) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          attrs.image = event.target.result;
+          this.createPost(attrs);
+        };
+        reader.readAsDataURL(this.imageFile);
+      } else {
+        this.createPost(attrs);
+      }
+    },
+
+    // Helper function to create the post
+    createPost: function(attrs) {
+      var post = new App.Post(attrs);
+      var validation = post.validate(post.attributes);
+      
+      if(validation){
+        alert(validation);
+        return;
+      }
+      
+      // Generate unique ID and set timestamp
+      post.set({
+        id: 'post_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString(),
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        liked: false
+      });
+      
+      // Add to collection (this will trigger the PostsView to render)
+      this.collection.add(post, { at: 0 });
+      App.persist();
+      
+      // Reset form
+      this.resetForm();
+    },
+
+    // Reset form function
+    resetForm: function() {
+      this.$('textarea').val('').trigger('input');
       this.$('.preview').hide().empty();
       this.imageFile = null;
       if (this.imageUrl) {
         URL.revokeObjectURL(this.imageUrl);
         this.imageUrl = null;
       }
-      this.$('#image-upload').val('');
-    });
-  }
-},
-    
-   publish: function(e){
-  e.preventDefault();
-  
-  var body = this.$('textarea').val().trim();
-  
-  // Check if body is empty before proceeding
-  if (!body || body.trim().length === 0) {
-    
-    return;
-  }
-  
-  var attrs = { 
-    body: body, 
-    user_id: this.user.id || 1,
-    image: '' // Don't use object URL for persistence
-  };
-  
-  // If we have an image file, we need to handle it differently
-  // For now, we'll just skip the image or convert it to data URL
-  if (this.imageFile) {
-    // Convert image to data URL for persistence
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      attrs.image = event.target.result;
-      this.createPost(attrs);
-    };
-    reader.readAsDataURL(this.imageFile);
-  } else {
-    this.createPost(attrs);
-  }
-},
-
-// Helper function to create the post
-createPost: function(attrs) {
-  var post = new App.Post(attrs);
-  var validation = post.validate(post.attributes);
-  
-  if(validation){
-    alert(validation);
-    return;
-  }
-  
-  // Generate unique ID and set timestamp
-  post.set({
-    id: 'post_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-    created_at: new Date().toISOString(),
-    likes: 0,
-    comments: 0,
-    shares: 0,
-    liked: false
-  });
-  
-  this.collection.add(post, { at: 0 }); // Add at beginning for newest first
-  App.persist();
-  
-  // Reset form
-  this.resetForm();
-  
-  // Scroll to show new post
-  $('html, body').animate({
-    scrollTop: $('#feed').offset().top - 100
-  }, 500);
-},
-
-// Reset form function
-resetForm: function() {
-  this.$('textarea').val('').trigger('input');
-  this.$('.preview').hide().empty();
-  this.imageFile = null;
-  if (this.imageUrl) {
-    URL.revokeObjectURL(this.imageUrl);
-    this.imageUrl = null;
-  }
-  this.$('#image-upload').val('');
-  this.$('.post-btn').prop('disabled', true);
-},
+      if (this.$('#image-upload').length) {
+        this.$('#image-upload').val('');
+      }
+      this.$('.post-btn').prop('disabled', true);
+    },
     
     // Clean up object URLs when view is removed
     remove: function() {
