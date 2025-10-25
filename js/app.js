@@ -138,6 +138,9 @@
         App.restore();
       }
 
+      // Store composer view instance to prevent duplicates
+      App.composerView = null;
+
       App.appView = {
         showFeed: function () {
           // Show composer and stories on home
@@ -148,11 +151,15 @@
           $('.icon-btn').removeClass('active');
           $('.icon-btn:first-child').addClass('active');
 
-          var composer = new App.ComposerView({
-            collection: App.posts,
-            user: App.users.get(1).toJSON()
-          });
+          // Only create composer view if it doesn't exist or was removed
+          if (!App.composerView || !App.composerView.$el.is(':visible')) {
+            App.composerView = new App.ComposerView({
+              collection: App.posts,
+              user: App.users.get(1).toJSON()
+            });
+          }
           
+          // Always recreate posts view to show latest posts
           App.postsView = new App.PostsView({
             collection: App.posts,
             users: App.users,
