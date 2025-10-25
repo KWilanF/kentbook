@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize users array
   function initializeUsers() {
     let users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
-    localStorage.setItem("kentbook_users", JSON.stringify(users));
+    if (users.length === 0) {
+      localStorage.setItem("kentbook_users", JSON.stringify(users));
+      console.log("Initialized empty users array");
+    }
     return users;
   }
 
@@ -28,10 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       mainApp.style.display = "block";
 
-      // Update user profile in sidebar
       updateUserProfile();
 
-      // Navigate to home route
       if (window.App && App.router) {
         App.router.navigate("home", { trigger: true });
       } else {
@@ -52,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
         profileCard.textContent = currentUser.name || currentUser.firstName + ' ' + currentUser.lastName;
       }
       
-      // Update dropdown profile name
       const dropdownProfileName = document.querySelector('.dropdown-profile-name');
       if (dropdownProfileName) {
         dropdownProfileName.textContent = currentUser.name || currentUser.firstName + ' ' + currentUser.lastName;
@@ -60,31 +60,148 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Toggle password visibility
+  function togglePasswordVisibility(inputId, toggleBtn) {
+    const passwordInput = document.getElementById(inputId);
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#65676B">
+          <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+        </svg>
+      `;
+      toggleBtn.title = "Hide password";
+    } else {
+      passwordInput.type = 'password';
+      toggleBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#65676B">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+        </svg>
+      `;
+      toggleBtn.title = "Show password";
+    }
+  }
+
+  // Add password toggle to login form (Facebook-style - inside but at the end)
+  function addLoginPasswordToggle() {
+    const passwordInput = document.getElementById('password');
+    if (passwordInput && !document.getElementById('loginTogglePassword')) {
+      const passwordWrapper = document.createElement('div');
+      passwordWrapper.style.cssText = `
+        position: relative;
+        margin-bottom: 12px;
+      `;
+      
+      // Wrap the existing password input
+      const parent = passwordInput.parentNode;
+      parent.insertBefore(passwordWrapper, passwordInput);
+      passwordWrapper.appendChild(passwordInput);
+      
+      // Add toggle button (Facebook-style - inside at the end)
+      const toggleBtn = document.createElement('button');
+      toggleBtn.id = 'loginTogglePassword';
+      toggleBtn.type = 'button';
+      toggleBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#65676B">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+        </svg>
+      `;
+      toggleBtn.title = "Show password";
+      toggleBtn.style.cssText = `
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #65676b;
+        padding: 6px;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      
+      toggleBtn.addEventListener('click', () => {
+        togglePasswordVisibility('password', toggleBtn);
+      });
+      
+      toggleBtn.addEventListener('mouseenter', () => {
+        toggleBtn.style.background = '#f0f2f5';
+      });
+      
+      toggleBtn.addEventListener('mouseleave', () => {
+        toggleBtn.style.background = 'none';
+      });
+      
+      passwordWrapper.appendChild(toggleBtn);
+      
+      // Update input style to accommodate toggle (Facebook-style padding)
+      passwordInput.style.paddingRight = '44px';
+      passwordInput.style.paddingLeft = '12px';
+      passwordInput.style.height = '52px';
+      passwordInput.style.fontSize = '16px';
+      passwordInput.style.borderRadius = '6px';
+      passwordInput.style.border = '1px solid #dddfe2';
+    }
+  }
+
   // === LOGIN ===
   if (loginForm) {
+    // Add password toggle to login form
+    addLoginPasswordToggle();
+    
+    // Style the username/email input to match Facebook
+    const usernameInput = document.getElementById('username');
+    if (usernameInput) {
+      usernameInput.style.padding = '14px 12px';
+      usernameInput.style.height = '52px';
+      usernameInput.style.fontSize = '16px';
+      usernameInput.style.borderRadius = '6px';
+      usernameInput.style.border = '1px solid #dddfe2';
+      usernameInput.style.marginBottom = '12px';
+    }
+    
+    // Style the login button to match Facebook
+    const loginButton = loginForm.querySelector('button[type="submit"]');
+    if (loginButton) {
+      loginButton.style.height = '48px';
+      loginButton.style.fontSize = '18px';
+      loginButton.style.fontWeight = '600';
+      loginButton.style.borderRadius = '6px';
+      loginButton.style.marginBottom = '16px';
+    }
+    
     loginForm.addEventListener("submit", function (e) {
       e.preventDefault();
 
       const enteredUser = document.getElementById("username").value.trim();
       const enteredPass = document.getElementById("password").value.trim();
 
-      // Validate inputs
       if (!enteredUser || !enteredPass) {
         showLoginError("Please enter both username/email and password");
         return;
       }
 
-      // Get current users list from localStorage
       const currentUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+      
+      console.log("Login attempt - Username:", enteredUser, "Users in system:", currentUsers.map(u => u.username));
       
       const foundUser = currentUsers.find(
         (u) => u.username === enteredUser || u.email === enteredUser
       );
 
+      if (foundUser) {
+        console.log("Found user:", foundUser.username, "Stored password:", foundUser.password, "Entered password:", enteredPass);
+      }
+
       if (foundUser && foundUser.password === enteredPass) {
-        // Login successful
         localStorage.setItem("kentbook_logged_in", "true");
         localStorage.setItem("kentbook_current_user", foundUser.username);
+        console.log("Login successful for user:", foundUser.username);
         showApp();
       } else {
         showLoginError("Invalid login credentials! Please check your username/email and password.");
@@ -128,14 +245,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Create account button handler - Show signup modal
+  // Create account button handler
   if (createAccountBtn) {
     createAccountBtn.addEventListener('click', function() {
       showSignupModal();
     });
   }
 
-  // Show signup modal
+   // Show signup modal
   function showSignupModal() {
     const existingModal = document.querySelector('.signup-modal-overlay');
     if (existingModal) {
@@ -161,42 +278,59 @@ document.addEventListener("DOMContentLoaded", function () {
     modalContent.className = 'signup-modal';
     modalContent.style.cssText = `
       background: white;
-      padding: 20px;
+      padding: 16px;
       border-radius: 8px;
       width: 90%;
-      max-width: 400px;
+      max-width: 432px;
       max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     `;
 
     modalContent.innerHTML = `
-      <div class="signup-header" style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #1877f2; margin: 0 0 8px 0;">Sign Up</h2>
-        <p style="color: #606770; margin: 0;">It's quick and easy.</p>
-        <div style="text-align: right;">
-          <button id="closeSignupModal" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #65676b;">×</button>
+      <div class="signup-header" style="text-align: center; margin-bottom: 16px;">
+        <h2 style="color: #1c1e21; margin: 0 0 8px 0; font-size: 25px; font-weight: 600;">Sign Up</h2>
+        <p style="color: #606770; margin: 0; font-size: 15px;">It's quick and easy.</p>
+        <div style="text-align: right; margin-top: -30px;">
+          <button id="closeSignupModal" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #65676b; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</button>
         </div>
       </div>
 
-      <form id="signupForm">
-        <input type="text" id="firstName" placeholder="First name" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box;" required />
-        
-        <input type="text" id="lastName" placeholder="Last name" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box;" required />
+      <form id="signupForm" style="border-top: 1px solid #dadde1; padding-top: 16px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <input type="text" id="firstName" placeholder="First name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+          <input type="text" id="lastName" placeholder="Last name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+        </div>
 
-        <input type="email" id="email" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box;" required />
+        <input type="email" id="email" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; margin-bottom: 10px; box-sizing: border-box;" required />
         
-        <input type="text" id="username" placeholder="Username" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box;" required />
+
         
-        <input type="password" id="password" placeholder="Password" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box;" required />
+        <!-- Password field with Facebook-style toggle -->
+        <div style="position: relative; margin-bottom: 10px;">
+          <input type="password" id="signupPassword" placeholder="Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+          <button type="button" id="toggleSignupPassword" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #65676b; padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" title="Show password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#65676B">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+          </button>
+        </div>
         
-        <input type="password" id="confirmPassword" placeholder="Confirm Password" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; margin-bottom: 16px; box-sizing: border-box;" required />
+        <!-- Confirm Password field with Facebook-style toggle -->
+        <div style="position: relative; margin-bottom: 16px;">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+          <button type="button" id="toggleConfirmPassword" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #65676b; padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" title="Show password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#65676B">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+          </button>
+        </div>
 
         <div style="font-size: 11px; color: #777; text-align: center; margin: 16px 0; line-height: 1.4;">
           By clicking Sign Up, you agree to our Terms, Privacy Policy and Cookies Policy. 
         </div>
 
-        <button type="submit" style="width: 100%; background: #00a400; color: white; border: none; border-radius: 6px; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer;">
+        <button type="submit" style="width: 100%; background: #00a400; color: white; border: none; border-radius: 6px; padding: 8px; font-size: 18px; font-weight: bold; cursor: pointer; height: 36px; margin-top: 10px;">
           Sign Up
         </button>
       </form>
@@ -216,45 +350,81 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // Add hover effects and functionality to signup form toggles
+    const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+
+    // Add hover effects
+    [toggleSignupPassword, toggleConfirmPassword].forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = '#f0f2f5';
+      });
+      
+      btn.addEventListener('mouseleave', () => {
+        btn.style.background = 'none';
+      });
+    });
+
+    // Add toggle functionality with correct IDs
+    toggleSignupPassword.addEventListener('click', function() {
+      togglePasswordVisibility('signupPassword', this);
+    });
+
+    toggleConfirmPassword.addEventListener('click', function() {
+      togglePasswordVisibility('confirmPassword', this);
+    });
+
     const signupForm = document.getElementById('signupForm');
     signupForm.addEventListener('submit', handleSignup);
   }
 
-  // Handle signup form submission - SIMPLIFIED
+  // Handle signup form submission - UPDATED with correct ID
   function handleSignup(e) {
     e.preventDefault();
+    console.log("=== SIGNUP PROCESS STARTED ===");
 
-    // Get form values
+    // Get form values - DON'T TRIM PASSWORDS!
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
     const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
+    const password = document.getElementById('signupPassword').value; // Updated ID
     const confirmPassword = document.getElementById('confirmPassword').value;
+
+    console.log("Form values:", { 
+      firstName, lastName, email, username, 
+      password: `"${password}"`, 
+      confirmPassword: `"${confirmPassword}"` 
+    });
 
     // Simple validation
     if (!firstName || !lastName || !email || !username || !password || !confirmPassword) {
+      console.log("Validation failed: Empty fields");
       showSignupError("Please fill in all fields");
       return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
-      showSignupError("Passwords do not match");
+      console.log("Validation failed: Passwords don't match exactly");
+      showSignupError(`Passwords do not match. Please make sure both passwords are exactly the same.`);
       return;
     }
 
     // Get existing users
     const users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+    console.log("Current users in storage:", users);
 
     // Check if username already exists
     if (users.some(user => user.username === username)) {
+      console.log("Validation failed: Username exists");
       showSignupError("Username already exists");
       return;
     }
 
     // Check if email already exists
     if (users.some(user => user.email === email)) {
+      console.log("Validation failed: Email exists");
       showSignupError("Email already registered");
       return;
     }
@@ -270,14 +440,25 @@ document.addEventListener("DOMContentLoaded", function () {
       joinedDate: new Date().toISOString()
     };
 
+    console.log("Creating new user:", newUser);
+
     // Add new user
     users.push(newUser);
 
     // Save to localStorage
     localStorage.setItem("kentbook_users", JSON.stringify(users));
+    
+    // Verify the save worked
+    const verifyUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+    console.log("Users after save:", verifyUsers);
 
-    // Show success message
-    showSignupSuccess();
+    if (verifyUsers.some(user => user.username === username)) {
+      console.log("✅ User successfully saved to localStorage!");
+      showSignupSuccess();
+    } else {
+      console.log("❌ Failed to save user");
+      showSignupError("Failed to create account. Please try again.");
+    }
   }
 
   // Show signup success
@@ -301,15 +482,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Show signup error - ADDED THIS MISSING FUNCTION
+  // Show signup error
   function showSignupError(message) {
-    // Remove existing error message
+    console.log("Showing signup error:", message);
+    
     const existingError = document.querySelector('.signup-error');
     if (existingError) {
       existingError.remove();
     }
 
-    // Create error message element
     const errorEl = document.createElement('div');
     errorEl.className = 'signup-error';
     errorEl.style.cssText = `
@@ -324,7 +505,6 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     errorEl.textContent = message;
 
-    // Insert after form
     const form = document.getElementById('signupForm');
     if (form) {
       form.parentNode.insertBefore(errorEl, form);
@@ -367,6 +547,24 @@ document.addEventListener("DOMContentLoaded", function () {
       .login-card input:focus {
         border-color: var(--primary) !important;
         box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2) !important;
+      }
+      /* Password toggle button styles */
+      .password-toggle-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #65676b;
+        padding: 6px;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+      }
+      .password-toggle-btn:hover {
+        background: #f0f2f5;
       }
     `;
     document.head.appendChild(style);
