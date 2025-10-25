@@ -518,6 +518,7 @@
       }
     },
     
+    // FIXED: This was the main problem - duplicate posts
     publish: function(e){
       e.preventDefault();
       
@@ -543,6 +544,7 @@
         };
         reader.readAsDataURL(this.imageFile);
       } else {
+        // No image - create post directly
         this.createPost(attrs);
       }
     },
