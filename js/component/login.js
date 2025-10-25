@@ -298,13 +298,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <form id="signupForm" style="border-top: 1px solid #dadde1; padding-top: 16px;">
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-          <input type="text" id="firstName" placeholder="First name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
-          <input type="text" id="lastName" placeholder="Last name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+          <input type="text" id="signupFirstName" placeholder="First name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
+          <input type="text" id="signupLastName" placeholder="Last name" style="flex: 1; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; box-sizing: border-box;" required />
         </div>
 
-        <input type="email" id="email" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; margin-bottom: 10px; box-sizing: border-box;" required />
-        
-
+        <input type="email" id="signupEmail" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; height: 40px; margin-bottom: 10px; box-sizing: border-box;" required />
         
         <!-- Password field with Facebook-style toggle -->
         <div style="position: relative; margin-bottom: 10px;">
@@ -378,27 +376,26 @@ document.addEventListener("DOMContentLoaded", function () {
     signupForm.addEventListener('submit', handleSignup);
   }
 
-  // Handle signup form submission - UPDATED with correct ID
+  // Handle signup form submission - UPDATED for username generation
   function handleSignup(e) {
     e.preventDefault();
     console.log("=== SIGNUP PROCESS STARTED ===");
 
     // Get form values - DON'T TRIM PASSWORDS!
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('signupPassword').value; // Updated ID
+    const firstName = document.getElementById('signupFirstName').value.trim();
+    const lastName = document.getElementById('signupLastName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     console.log("Form values:", { 
-      firstName, lastName, email, username, 
+      firstName, lastName, email, 
       password: `"${password}"`, 
       confirmPassword: `"${confirmPassword}"` 
     });
 
     // Simple validation
-    if (!firstName || !lastName || !email || !username || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       console.log("Validation failed: Empty fields");
       showSignupError("Please fill in all fields");
       return;
@@ -411,6 +408,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Generate username from email (everything before @)
+    const username = email.split('@')[0];
+    console.log("Generated username from email:", username);
+
     // Get existing users
     const users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
     console.log("Current users in storage:", users);
@@ -418,7 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Check if username already exists
     if (users.some(user => user.username === username)) {
       console.log("Validation failed: Username exists");
-      showSignupError("Username already exists");
+      showSignupError("An account with this email already exists");
       return;
     }
 
@@ -435,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function () {
       lastName: lastName,
       name: `${firstName} ${lastName}`,
       email: email,
-      username: username,
+      username: username, // Auto-generated from email
       password: password,
       joinedDate: new Date().toISOString()
     };
@@ -470,7 +471,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div style="background: white; padding: 40px; border-radius: 8px; text-align: center; max-width: 400px;">
         <div style="color: #00a400; font-size: 48px; margin-bottom: 20px;">✓</div>
         <h3 style="color: #1877f2; margin-bottom: 10px;">Account Created Successfully!</h3>
-        <p style="color: #606770; margin-bottom: 20px;">You can now log in with your credentials.</p>
+        <p style="color: #606770; margin-bottom: 20px;">You can now log in with your email address.</p>
         <button id="closeSuccessModal" style="background: #1877f2; color: white; border: none; border-radius: 6px; padding: 12px 24px; font-size: 16px; cursor: pointer;">
           Continue to Login
         </button>
