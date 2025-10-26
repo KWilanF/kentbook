@@ -1,36 +1,52 @@
 // Profile Picture Manager - Singleton pattern
 const ProfilePictureManager = (function() {
     let instance;
-    let currentProfilePic = '../images/pp.png'; // Default profile picture
+    const defaultProfilePic = 'images/pp.png';
     
     function createInstance() {
         return {
-            // Set profile picture
+            // Set profile picture for current user
             setProfilePicture: function(newImageSrc) {
-                currentProfilePic = newImageSrc;
+                const currentUsername = localStorage.getItem("kentbook_current_user");
+                if (!currentUsername) return;
+                
+                // Save to user-specific storage
+                this.saveUserProfilePicture(currentUsername, newImageSrc);
                 this.updateBackboneUserModel();
                 this.updateAllProfilePictures();
-                this.saveToLocalStorage();
                 
-                // Trigger custom event for Backbone views - ADDED THIS LINE
+                // Trigger custom event for Backbone views
                 $(document).trigger('profilePictureChanged');
             },
             
-            // Get current profile picture
+            // Get current user's profile picture
             getProfilePicture: function() {
-                const savedPic = localStorage.getItem('kentbook_profile_pic');
-                return savedPic || currentProfilePic;
+                const currentUsername = localStorage.getItem("kentbook_current_user");
+                if (!currentUsername) return defaultProfilePic;
+                
+                return this.getUserProfilePicture(currentUsername) || defaultProfilePic;
+            },
+            
+            // Get profile picture for specific user
+            getUserProfilePicture: function(username) {
+                const userPictures = JSON.parse(localStorage.getItem('kentbook_user_profile_pictures') || '{}');
+                return userPictures[username];
+            },
+            
+            // Save profile picture for specific user
+            saveUserProfilePicture: function(username, imageSrc) {
+                const userPictures = JSON.parse(localStorage.getItem('kentbook_user_profile_pictures') || '{}');
+                userPictures[username] = imageSrc;
+                localStorage.setItem('kentbook_user_profile_pictures', JSON.stringify(userPictures));
             },
             
             // Update Backbone User model with new profile picture
             updateBackboneUserModel: function() {
-                // Get current user from localStorage
                 const currentUsername = localStorage.getItem("kentbook_current_user");
                 const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
                 const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
                 
                 if (currentUserData && window.App && window.App.users) {
-                    // Find the current user in Backbone users collection
                     const currentBackboneUser = App.users.find(user => 
                         user.get('name') === currentUserData.name || 
                         user.get('email') === currentUserData.email
@@ -38,7 +54,7 @@ const ProfilePictureManager = (function() {
                     
                     if (currentBackboneUser) {
                         console.log("Updating Backbone user model avatar");
-                        currentBackboneUser.set('avatar', currentProfilePic);
+                        currentBackboneUser.set('avatar', this.getProfilePicture());
                         
                         // Trigger change event to re-render views
                         App.users.trigger('change');
@@ -49,6 +65,8 @@ const ProfilePictureManager = (function() {
             
             // Update all profile picture elements on the page
             updateAllProfilePictures: function() {
+                const currentProfilePic = this.getProfilePicture();
+                
                 // Update DOM elements directly
                 const profileImages = document.querySelectorAll(
                     'img[alt="Kent Wilan"], img[alt="user"], #profileImage, #profileImageSmall, .avatar, .profile-photo img, .story img[src*="pp.png"]'
@@ -56,7 +74,6 @@ const ProfilePictureManager = (function() {
                 
                 profileImages.forEach(img => {
                     if (img.tagName === 'IMG') {
-                        // Only update if it's a profile picture (not story backgrounds, etc.)
                         if (img.src.includes('pp.png') || 
                             img.alt.includes('Kent') || 
                             img.alt.includes('user') ||
@@ -66,12 +83,13 @@ const ProfilePictureManager = (function() {
                     }
                 });
                 
-                // Update specific elements with more precision
                 this.updateSpecificElements();
             },
             
-            // Update specific elements that need special handling
+            // Update specific elements with more precision
             updateSpecificElements: function() {
+                const currentProfilePic = this.getProfilePicture();
+                
                 // Update header dropdown avatar
                 const headerAvatar = document.querySelector('.dropdown-profile .avatar');
                 if (headerAvatar) {
@@ -97,24 +115,8 @@ const ProfilePictureManager = (function() {
                 }
             },
             
-            // Save to localStorage
-            saveToLocalStorage: function() {
-                localStorage.setItem('kentbook_profile_pic', currentProfilePic);
-            },
-            
-            // Load from localStorage
-            loadFromLocalStorage: function() {
-                const savedPic = localStorage.getItem('kentbook_profile_pic');
-                if (savedPic) {
-                    currentProfilePic = savedPic;
-                    this.updateBackboneUserModel();
-                    this.updateAllProfilePictures();
-                }
-            },
-            
-            // Initialize
+            // Initialize for current user
             init: function() {
-                this.loadFromLocalStorage();
                 this.updateAllProfilePictures();
                 
                 // Listen for Backbone collection changes to update avatars
@@ -133,11 +135,17 @@ const ProfilePictureManager = (function() {
                 
                 // Also listen for posts rendering
                 App.posts.on('add remove reset', () => {
-                    // Small delay to ensure DOM is updated
                     setTimeout(() => {
                         this.updateAllProfilePictures();
                     }, 100);
                 });
+            },
+            
+            // Clean up user data (optional - for account deletion)
+            deleteUserProfilePicture: function(username) {
+                const userPictures = JSON.parse(localStorage.getItem('kentbook_user_profile_pictures') || '{}');
+                delete userPictures[username];
+                localStorage.setItem('kentbook_user_profile_pictures', JSON.stringify(userPictures));
             }
         };
     }
@@ -150,4 +158,4 @@ const ProfilePictureManager = (function() {
             return instance;
         }
     };
-})(); 
+})();

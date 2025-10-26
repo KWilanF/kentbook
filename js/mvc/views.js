@@ -423,17 +423,18 @@
       var user = this.users.get(post.get('user_id'));
       var userData = user ? user.toDisplay() : { 
         name: 'Guest', 
-        avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
+        avatar: 'images/pp.png' 
       };
       
-      // Update avatar if this is the current user
-      if (this.profileManager) {
-        const currentUsername = localStorage.getItem("kentbook_current_user");
-        const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
-        const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
-        
-        if (currentUserData && userData.name === currentUserData.name) {
-          userData.avatar = this.profileManager.getProfilePicture();
+      // Use user-specific profile picture if available
+      if (typeof ProfilePictureManager !== 'undefined' && user) {
+        const profileManager = ProfilePictureManager.getInstance();
+        const username = user.get('username');
+        if (username) {
+          const userProfilePic = profileManager.getUserProfilePicture(username);
+          if (userProfilePic) {
+            userData.avatar = userProfilePic;
+          }
         }
       }
       
@@ -466,17 +467,18 @@
         var user = this.users.get(post.get('user_id'));
         var userData = user ? user.toDisplay() : { 
           name: 'Guest', 
-          avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
+          avatar: 'images/pp.png' 
         };
         
-        // Update avatar if this is the current user
-        if (this.profileManager) {
-          const currentUsername = localStorage.getItem("kentbook_current_user");
-          const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
-          const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
-          
-          if (currentUserData && userData.name === currentUserData.name) {
-            userData.avatar = this.profileManager.getProfilePicture();
+        // Use user-specific profile picture if available
+        if (typeof ProfilePictureManager !== 'undefined' && user) {
+          const profileManager = ProfilePictureManager.getInstance();
+          const username = user.get('username');
+          if (username) {
+            const userProfilePic = profileManager.getUserProfilePicture(username);
+            if (userProfilePic) {
+              userData.avatar = userProfilePic;
+            }
           }
         }
         

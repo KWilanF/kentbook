@@ -2,30 +2,30 @@
 (function(){
   window.App = window.App || {};
 
-  App.User = Backbone.Model.extend({
+ App.User = Backbone.Model.extend({
     defaults: {
         id: null,
         name: "Anonymous",
         email: "",
         avatar: "",
-        isOnline: true
+        isOnline: true,
+        username: "" // Add username field
     },
     
     // Format for display in UI
     toDisplay: function() {
-        // Get current profile picture from manager if available
         let avatar = this.get('avatar');
+        
+        // Use user-specific profile picture if available
         if (typeof ProfilePictureManager !== 'undefined') {
             const profileManager = ProfilePictureManager.getInstance();
-            const currentUserUsername = localStorage.getItem("kentbook_current_user");
-            const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
-            const currentUserData = localStorageUsers.find(u => u.username === currentUserUsername);
+            const username = this.get('username');
             
-            // If this is the current user, use the managed profile picture
-            if (currentUserData && 
-                (this.get('name') === currentUserData.name || 
-                 this.get('email') === currentUserData.email)) {
-                avatar = profileManager.getProfilePicture();
+            if (username) {
+                const userProfilePic = profileManager.getUserProfilePicture(username);
+                if (userProfilePic) {
+                    avatar = userProfilePic;
+                }
             }
         }
         
@@ -33,7 +33,8 @@
             name: this.get('name'),
             avatar: avatar || 'images/pp.png',
             email: this.get('email'),
-            isOnline: this.get('isOnline')
+            isOnline: this.get('isOnline'),
+            username: this.get('username')
         };
     }
 });

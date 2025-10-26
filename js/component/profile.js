@@ -23,6 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const coverPicInput = document.getElementById('coverPicInput');
     const coverPicPreview = document.getElementById('coverPicPreview');
     
+    // Initialize with current user's profile picture
+    const currentProfilePic = profileManager.getProfilePicture();
+    document.getElementById('profileImage').src = currentProfilePic;
+    document.getElementById('profileImageSmall').src = currentProfilePic;
+    
+    // Set preview to current picture
+    profilePicPreview.src = currentProfilePic;
+    
     // Open Profile Picture Modal
     changePhotoBtn.addEventListener('click', function() {
         profilePicPreview.src = profileManager.getProfilePicture();
@@ -69,43 +77,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-// Save Profile Picture
-saveProfilePic.addEventListener('click', function() {
-    if (profilePicInput.files && profilePicInput.files[0]) {
-        const file = profilePicInput.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            // Update profile picture globally
-            profileManager.setProfilePicture(e.target.result);
+    // Save Profile Picture
+    saveProfilePic.addEventListener('click', function() {
+        if (profilePicInput.files && profilePicInput.files[0]) {
+            const file = profilePicInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Update profile picture globally
+                profileManager.setProfilePicture(e.target.result);
+                closeModals();
+                
+                // Update the profile images on the page immediately
+                document.getElementById('profileImage').src = e.target.result;
+                document.getElementById('profileImageSmall').src = e.target.result;
+                
+                // Force refresh of Backbone views
+                if (window.App && window.App.postsView) {
+                    App.postsView.render();
+                }
+                
+                // Show success message
+                showNotification('Profile picture updated successfully!');
+                
+                // Optional: Refresh page after a short delay to ensure all updates
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 1000);
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            // If no file selected, just update with current preview
+            profileManager.setProfilePicture(profilePicPreview.src);
             closeModals();
             
-            // Force refresh of Backbone views
+            // Update the profile images on the page immediately
+            document.getElementById('profileImage').src = profilePicPreview.src;
+            document.getElementById('profileImageSmall').src = profilePicPreview.src;
+            
+            // Force refresh
             if (window.App && window.App.postsView) {
                 App.postsView.render();
             }
             
             // Show success message
             showNotification('Profile picture updated successfully!');
-            
-            // Refresh page after a short delay to ensure all updates
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
         }
-        
-        reader.readAsDataURL(file);
-    } else {
-        // If no file selected, just update with current preview
-        profileManager.setProfilePicture(profilePicPreview.src);
-        closeModals();
-        
-        // Force refresh
-        if (window.App && window.App.postsView) {
-            App.postsView.render();
-        }
-    }
-});
+    });
     
     // Save Cover Photo
     saveCoverPic.addEventListener('click', function() {
@@ -134,6 +153,7 @@ saveProfilePic.addEventListener('click', function() {
     if (savedCoverPic) {
         const coverPhoto = document.querySelector('.cover-photo img');
         coverPhoto.src = savedCoverPic;
+        coverPicPreview.src = savedCoverPic;
     }
     
     // Utility function to show notifications

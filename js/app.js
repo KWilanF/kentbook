@@ -56,17 +56,14 @@
       if (isLoggedIn && currentUsername) {
         console.log("User is logged in:", currentUsername);
         
-        // ===== PROFILE PICTURE MANAGER INITIALIZATION =====
-        // Initialize profile picture manager
+        // Initialize profile picture manager for current user
         if (typeof ProfilePictureManager !== 'undefined') {
           const profileManager = ProfilePictureManager.getInstance();
           profileManager.init();
-          console.log("Profile picture manager initialized");
-        } else {
-          console.warn("ProfilePictureManager not available");
+          console.log("Profile picture manager initialized for user:", currentUsername);
         }
-        // ===== END PROFILE PICTURE MANAGER INITIALIZATION =====
         
+        // ... rest of your existing initialization code
         // User is logged in, restore their data
         App.restore();
         

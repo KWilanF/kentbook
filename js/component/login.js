@@ -17,6 +17,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const users = initializeUsers();
 
+  // === FUNCTION: Create new user with profile picture setup ===
+  function createNewUser(userData) {
+    const users = JSON.parse(localStorage.getItem('kentbook_users') || '[]');
+    
+    // New users get default pp.png
+    const newUser = {
+      ...userData,
+      avatar: 'images/pp.png', // Default for new users
+      createdAt: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('kentbook_users', JSON.stringify(users));
+    
+    // Initialize with default profile picture
+    if (typeof ProfilePictureManager !== 'undefined') {
+      const profileManager = ProfilePictureManager.getInstance();
+      profileManager.saveUserProfilePicture(userData.username, 'images/pp.png');
+      console.log("✅ Profile picture initialized for new user:", userData.username);
+    }
+    
+    return newUser;
+  }
+
   // === FUNCTION: Show main app after login ===
   function showApp() {
     loginPage.style.display = "none";
@@ -376,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
     signupForm.addEventListener('submit', handleSignup);
   }
 
-  // Handle signup form submission - UPDATED for username generation
+  // Handle signup form submission - UPDATED for username generation and profile picture setup
   function handleSignup(e) {
     e.preventDefault();
     console.log("=== SIGNUP PROCESS STARTED ===");
@@ -431,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Create new user object
-    const newUser = {
+    const userData = {
       firstName: firstName,
       lastName: lastName,
       name: `${firstName} ${lastName}`,
@@ -441,20 +465,27 @@ document.addEventListener("DOMContentLoaded", function () {
       joinedDate: new Date().toISOString()
     };
 
-    console.log("Creating new user:", newUser);
+    console.log("Creating new user:", userData);
 
-    // Add new user
-    users.push(newUser);
+    // Use the createNewUser function to create user with profile picture setup
+    const newUser = createNewUser(userData);
 
-    // Save to localStorage
-    localStorage.setItem("kentbook_users", JSON.stringify(users));
-    
     // Verify the save worked
     const verifyUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
     console.log("Users after save:", verifyUsers);
 
+    // Also verify profile picture was saved
+    let profilePictureVerified = false;
+    if (typeof ProfilePictureManager !== 'undefined') {
+      const profileManager = ProfilePictureManager.getInstance();
+      const savedPicture = profileManager.getUserProfilePicture(username);
+      profilePictureVerified = savedPicture === 'images/pp.png';
+      console.log("Profile picture verification:", profilePictureVerified, savedPicture);
+    }
+
     if (verifyUsers.some(user => user.username === username)) {
       console.log("✅ User successfully saved to localStorage!");
+      console.log("✅ Profile picture setup:", profilePictureVerified ? "SUCCESS" : "PENDING");
       showSignupSuccess();
     } else {
       console.log("❌ Failed to save user");
