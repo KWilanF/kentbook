@@ -9,7 +9,6 @@
       this.bindMenuButton();
       this.bindDropdownNavigation();
       this.bindSearch();
-      this.bindProfileClicks();
     },
 
     // Bind menu button for dropdown
@@ -86,40 +85,6 @@
         searchInput.addEventListener('input', function() {
           // Add search functionality here if needed
           console.log('Search:', this.value);
-        });
-      }
-    },
-
-    // Bind profile clicks in sidebar and dropdown
-    bindProfileClicks: function() {
-      // Profile card in sidebar
-      const profileCard = document.querySelector('.left-sidebar .profile-card');
-      if (profileCard) {
-        profileCard.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (window.App.router) {
-            App.router.navigate('profile', { trigger: true });
-          } else {
-            window.location.hash = 'profile';
-          }
-        });
-      }
-
-      // Profile link in dropdown
-      const profileLink = document.querySelector('.dropdown-profile-link');
-      if (profileLink) {
-        profileLink.addEventListener('click', (e) => {
-          e.preventDefault();
-          const dropdownMenu = document.querySelector('.dropdown-menu');
-          if (dropdownMenu) {
-            dropdownMenu.style.display = 'none';
-          }
-          
-          if (window.App.router) {
-            App.router.navigate('profile', { trigger: true });
-          } else {
-            window.location.hash = 'profile';
-          }
         });
       }
     },
