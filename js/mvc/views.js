@@ -103,8 +103,43 @@
       this.listenTo(this.model, 'destroy', this.remove);
       this.listenTo(this.comments, 'add remove reset', this.renderComments);
       
+      // Listen for profile picture changes
+      if (typeof ProfilePictureManager !== 'undefined') {
+        this.profileManager = ProfilePictureManager.getInstance();
+        $(document).on('profilePictureChanged.postview', this.onProfilePictureChange.bind(this));
+      }
+      
       // Close dropdown when clicking elsewhere
       $(document).on('click.postview', this.onDocumentClick.bind(this));
+    },
+    
+    // Handle profile picture changes
+    onProfilePictureChange: function() {
+      console.log('Profile picture changed, updating post view');
+      this.updateUserAvatars();
+      this.render();
+    },
+    
+    // Update user avatars with current profile picture
+    updateUserAvatars: function() {
+      if (!this.profileManager) return;
+      
+      const currentProfilePic = this.profileManager.getProfilePicture();
+      const currentUsername = localStorage.getItem("kentbook_current_user");
+      const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+      const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
+      
+      if (currentUserData) {
+        // Update post author avatar if it's the current user
+        if (this.user && this.user.name === currentUserData.name) {
+          this.user.avatar = currentProfilePic;
+        }
+        
+        // Update current user avatar in comments
+        if (this.currentUser && this.currentUser.name === currentUserData.name) {
+          this.currentUser.avatar = currentProfilePic;
+        }
+      }
     },
     
     onMenuClick: function(e){
@@ -266,10 +301,15 @@
       
       postComments.forEach((comment) => {
         const commentUser = window.App.users.get(comment.get('user_id'));
-        const userData = commentUser ? commentUser.toDisplay() : { 
+        let userData = commentUser ? commentUser.toDisplay() : { 
           name: 'Guest', 
           avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
         };
+        
+        // Update avatar if this is the current user
+        if (this.profileManager && comment.get('user_id') === this.currentUser.id) {
+          userData.avatar = this.profileManager.getProfilePicture();
+        }
         
         const isCurrentUserComment = comment.get('user_id') === this.currentUser.id;
         
@@ -317,12 +357,16 @@
     },
     
     remove: function() {
-      // Clean up document event listener
+      // Clean up event listeners
       $(document).off('click.postview');
+      $(document).off('profilePictureChanged.postview');
       return Backbone.View.prototype.remove.call(this);
     },
     
     render: function(){
+      // Update avatars before rendering
+      this.updateUserAvatars();
+      
       var user = this.user || { name: 'Unknown', avatar: 'https://randomuser.me/api/portraits/men/0.jpg' };
       var time = this.model.getTimeAgo ? this.model.getTimeAgo() : new Date(this.model.get('created_at')).toLocaleString();
       
@@ -354,6 +398,25 @@
       this.listenTo(this.collection, 'add', this.addPost);
       this.listenTo(this.collection, 'remove', this.render);
       this.listenTo(this.collection, 'reset', this.render);
+      
+      // Listen for user changes to update avatars
+      this.listenTo(this.users, 'change', this.onUserChange);
+      
+      // Listen for profile picture changes
+      if (typeof ProfilePictureManager !== 'undefined') {
+        this.profileManager = ProfilePictureManager.getInstance();
+        $(document).on('profilePictureChanged.postsview', this.onProfilePictureChange.bind(this));
+      }
+    },
+    
+    onUserChange: function() {
+      // Re-render when user data changes
+      this.render();
+    },
+    
+    onProfilePictureChange: function() {
+      console.log('Profile picture changed, re-rendering posts');
+      this.render();
     },
     
     addPost: function(post) {
@@ -362,6 +425,17 @@
         name: 'Guest', 
         avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
       };
+      
+      // Update avatar if this is the current user
+      if (this.profileManager) {
+        const currentUsername = localStorage.getItem("kentbook_current_user");
+        const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+        const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
+        
+        if (currentUserData && userData.name === currentUserData.name) {
+          userData.avatar = this.profileManager.getProfilePicture();
+        }
+      }
       
       var v = new App.PostView({
         model: post, 
@@ -395,6 +469,17 @@
           avatar: 'https://randomuser.me/api/portraits/men/0.jpg' 
         };
         
+        // Update avatar if this is the current user
+        if (this.profileManager) {
+          const currentUsername = localStorage.getItem("kentbook_current_user");
+          const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+          const currentUserData = localStorageUsers.find(u => u.username === currentUsername);
+          
+          if (currentUserData && userData.name === currentUserData.name) {
+            userData.avatar = this.profileManager.getProfilePicture();
+          }
+        }
+        
         var v = new App.PostView({
           model: post, 
           user: userData,
@@ -405,6 +490,12 @@
       }, this);
       
       return this;
+    },
+    
+    remove: function() {
+      // Clean up event listeners
+      $(document).off('profilePictureChanged.postsview');
+      return Backbone.View.prototype.remove.call(this);
     }
   });
 
@@ -455,8 +546,23 @@
       this.user = opts.user;
       this.imageFile = null;
       this.imageUrl = null;
+      
+      // Listen for profile picture changes to update composer avatar
+      if (typeof ProfilePictureManager !== 'undefined') {
+        this.profileManager = ProfilePictureManager.getInstance();
+        $(document).on('profilePictureChanged.composerview', this.onProfilePictureChange.bind(this));
+      }
+      
       this.render();
       this.setupTextareaAutoResize();
+    },
+    
+    onProfilePictureChange: function() {
+      console.log('Profile picture changed, updating composer');
+      if (this.profileManager) {
+        this.user.avatar = this.profileManager.getProfilePicture();
+        this.render();
+      }
     },
     
     setupTextareaAutoResize: function() {
@@ -595,6 +701,7 @@
       if (this.imageUrl) {
         URL.revokeObjectURL(this.imageUrl);
       }
+      $(document).off('profilePictureChanged.composerview');
       return Backbone.View.prototype.remove.call(this);
     },
     

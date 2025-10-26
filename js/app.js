@@ -56,6 +56,17 @@
       if (isLoggedIn && currentUsername) {
         console.log("User is logged in:", currentUsername);
         
+        // ===== PROFILE PICTURE MANAGER INITIALIZATION =====
+        // Initialize profile picture manager
+        if (typeof ProfilePictureManager !== 'undefined') {
+          const profileManager = ProfilePictureManager.getInstance();
+          profileManager.init();
+          console.log("Profile picture manager initialized");
+        } else {
+          console.warn("ProfilePictureManager not available");
+        }
+        // ===== END PROFILE PICTURE MANAGER INITIALIZATION =====
+        
         // User is logged in, restore their data
         App.restore();
         
@@ -80,7 +91,6 @@
             console.log("Creating new Backbone user model");
             
             // Create Backbone user model for the current user
-            // NOTE: User model in models.js doesn't have 'username' field, using 'name' and 'email'
             const userModel = new App.User({
               id: userId,
               name: currentUserData.name || currentUserData.firstName + ' ' + currentUserData.lastName,

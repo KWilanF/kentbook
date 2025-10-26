@@ -1,249 +1,174 @@
-// Profile page functionality
+// Profile picture functionality
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM elements
-  const changePhotoBtn = document.getElementById('changePhotoBtn');
-  const changeCoverBtn = document.getElementById('changeCoverBtn');
-  const profilePicModal = document.getElementById('profilePicModal');
-  const coverPicModal = document.getElementById('coverPicModal');
-  const closeModal = document.getElementById('closeModal');
-  const closeCoverModal = document.getElementById('closeCoverModal');
-  const cancelChange = document.getElementById('cancelChange');
-  const cancelCoverChange = document.getElementById('cancelCoverChange');
-  const profilePicInput = document.getElementById('profilePicInput');
-  const coverPicInput = document.getElementById('coverPicInput');
-  const saveProfilePic = document.getElementById('saveProfilePic');
-  const saveCoverPic = document.getElementById('saveCoverPic');
-  const profileImage = document.getElementById('profileImage');
-  const profileImageSmall = document.getElementById('profileImageSmall');
-  const profilePicPreview = document.getElementById('profilePicPreview');
-  const coverPicPreview = document.getElementById('coverPicPreview');
-  const coverPhoto = document.querySelector('.cover-photo img');
-
-  // Show modal when change photo button is clicked
-  changePhotoBtn.addEventListener('click', function() {
-    profilePicModal.style.display = 'flex';
-  });
-
-  // Show modal when change cover button is clicked
-  changeCoverBtn.addEventListener('click', function() {
-    coverPicModal.style.display = 'flex';
-  });
-
-  // Close modal when X is clicked
-  closeModal.addEventListener('click', function() {
-    profilePicModal.style.display = 'none';
-    profilePicInput.value = '';
-  });
-
-  closeCoverModal.addEventListener('click', function() {
-    coverPicModal.style.display = 'none';
-    coverPicInput.value = '';
-  });
-
-  // Close modal when cancel is clicked
-  cancelChange.addEventListener('click', function() {
-    profilePicModal.style.display = 'none';
-    profilePicInput.value = '';
-  });
-
-  cancelCoverChange.addEventListener('click', function() {
-    coverPicModal.style.display = 'none';
-    coverPicInput.value = '';
-  });
-
-  // Close modal when clicking outside the modal content
-  window.addEventListener('click', function(event) {
-    if (event.target === profilePicModal) {
-      profilePicModal.style.display = 'none';
-      profilePicInput.value = '';
-    }
-    if (event.target === coverPicModal) {
-      coverPicModal.style.display = 'none';
-      coverPicInput.value = '';
-    }
-  });
-
-  // Preview profile picture when file is selected
-  profilePicInput.addEventListener('change', function() {
-    const file = this.files[0];
+    const profileManager = ProfilePictureManager.getInstance();
     
-    if (file) {
-      // Validate file type
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file (JPEG, PNG, etc.)');
-        this.value = '';
-        return;
-      }
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Please select an image smaller than 5MB');
-        this.value = '';
-        return;
-      }
-      
-      // Create a FileReader to read the image
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        // Update preview image
-        profilePicPreview.src = e.target.result;
-      };
-      
-      reader.readAsDataURL(file);
-    }
-  });
-
-  // Preview cover photo when file is selected
-  coverPicInput.addEventListener('change', function() {
-    const file = this.files[0];
+    // Initialize profile pictures
+    profileManager.init();
     
-    if (file) {
-      // Validate file type
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file (JPEG, PNG, etc.)');
-        this.value = '';
-        return;
-      }
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Please select an image smaller than 5MB');
-        this.value = '';
-        return;
-      }
-      
-      // Create a FileReader to read the image
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        // Update preview image
-        coverPicPreview.src = e.target.result;
-      };
-      
-      reader.readAsDataURL(file);
-    }
-  });
-
-  // Handle profile picture change
-  saveProfilePic.addEventListener('click', function() {
-    const file = profilePicInput.files[0];
+    // Profile Picture Modal Elements
+    const profilePicModal = document.getElementById('profilePicModal');
+    const changePhotoBtn = document.getElementById('changePhotoBtn');
+    const closeModal = document.getElementById('closeModal');
+    const cancelChange = document.getElementById('cancelChange');
+    const saveProfilePic = document.getElementById('saveProfilePic');
+    const profilePicInput = document.getElementById('profilePicInput');
+    const profilePicPreview = document.getElementById('profilePicPreview');
     
-    if (file) {
-      // Create a FileReader to read the image
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        // Update profile image with the new image
-        profileImage.src = e.target.result;
-        profileImageSmall.src = e.target.result;
-        
-        // In a real application, you would send this to the server
-        // For now, we'll store it in localStorage
-        localStorage.setItem('kentbook_profile_pic', e.target.result);
-        
-        // Close the modal
+    // Cover Photo Modal Elements
+    const coverPicModal = document.getElementById('coverPicModal');
+    const changeCoverBtn = document.getElementById('changeCoverBtn');
+    const closeCoverModal = document.getElementById('closeCoverModal');
+    const cancelCoverChange = document.getElementById('cancelCoverChange');
+    const saveCoverPic = document.getElementById('saveCoverPic');
+    const coverPicInput = document.getElementById('coverPicInput');
+    const coverPicPreview = document.getElementById('coverPicPreview');
+    
+    // Open Profile Picture Modal
+    changePhotoBtn.addEventListener('click', function() {
+        profilePicPreview.src = profileManager.getProfilePicture();
+        profilePicModal.style.display = 'flex';
+    });
+    
+    // Open Cover Photo Modal
+    changeCoverBtn.addEventListener('click', function() {
+        coverPicModal.style.display = 'flex';
+    });
+    
+    // Close Modals
+    function closeModals() {
         profilePicModal.style.display = 'none';
-        profilePicInput.value = '';
-        
-        // Show success message
-        alert('Profile picture updated successfully!');
-      };
-      
-      reader.readAsDataURL(file);
-    } else {
-      alert('Please select an image to upload');
-    }
-  });
-
-  // Handle cover photo change
-  saveCoverPic.addEventListener('click', function() {
-    const file = coverPicInput.files[0];
-    
-    if (file) {
-      // Create a FileReader to read the image
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        // Update cover photo with the new image
-        coverPhoto.src = e.target.result;
-        
-        // In a real application, you would send this to the server
-        // For now, we'll store it in localStorage
-        localStorage.setItem('kentbook_cover_pic', e.target.result);
-        
-        // Close the modal
         coverPicModal.style.display = 'none';
-        coverPicInput.value = '';
-        
-        // Show success message
-        alert('Cover photo updated successfully!');
-      };
-      
-      reader.readAsDataURL(file);
-    } else {
-      alert('Please select an image to upload');
     }
-  });
-
-  // Load saved profile picture from localStorage if available
-  const savedProfilePic = localStorage.getItem('kentbook_profile_pic');
-  if (savedProfilePic) {
-    profileImage.src = savedProfilePic;
-    profileImageSmall.src = savedProfilePic;
-  }
-
-  // Load saved cover photo from localStorage if available
-  const savedCoverPic = localStorage.getItem('kentbook_cover_pic');
-  if (savedCoverPic) {
-    coverPhoto.src = savedCoverPic;
-  }
-
-  // Handle navigation active states
-  const navItems = document.querySelectorAll('.profile-nav li');
-  navItems.forEach(item => {
-    item.addEventListener('click', function() {
-      // Remove active class from all items
-      navItems.forEach(navItem => navItem.classList.remove('active'));
-      
-      // Add active class to clicked item
-      this.classList.add('active');
-      
-      // In a real application, you would load the appropriate content
-      // based on which tab was clicked
+    
+    closeModal.addEventListener('click', closeModals);
+    cancelChange.addEventListener('click', closeModals);
+    closeCoverModal.addEventListener('click', closeModals);
+    cancelCoverChange.addEventListener('click', closeModals);
+    
+    // Profile Picture Preview
+    profilePicInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profilePicPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
     });
-  });
-
-  // Handle top navigation active states
-  const topNavItems = document.querySelectorAll('.topbar .icon-btn');
-  topNavItems.forEach(item => {
-    item.addEventListener('click', function() {
-      // Remove active class from all items
-      topNavItems.forEach(navItem => navItem.classList.remove('active'));
-      
-      // Add active class to clicked item
-      this.classList.add('active');
+    
+    // Cover Photo Preview
+    coverPicInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                coverPicPreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
     });
-  });
-
-  // Handle post actions
-  const postActions = document.querySelectorAll('.post-action');
-  postActions.forEach(action => {
-    action.addEventListener('click', function() {
-      const actionText = this.querySelector('span').textContent;
-      
-      // In a real application, this would trigger the appropriate action
-      // For now, we'll just log it
-      console.log(`${actionText} button clicked`);
+    
+// Save Profile Picture
+saveProfilePic.addEventListener('click', function() {
+    if (profilePicInput.files && profilePicInput.files[0]) {
+        const file = profilePicInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Update profile picture globally
+            profileManager.setProfilePicture(e.target.result);
+            closeModals();
+            
+            // Force refresh of Backbone views
+            if (window.App && window.App.postsView) {
+                App.postsView.render();
+            }
+            
+            // Show success message
+            showNotification('Profile picture updated successfully!');
+            
+            // Refresh page after a short delay to ensure all updates
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        // If no file selected, just update with current preview
+        profileManager.setProfilePicture(profilePicPreview.src);
+        closeModals();
+        
+        // Force refresh
+        if (window.App && window.App.postsView) {
+            App.postsView.render();
+        }
+    }
+});
+    
+    // Save Cover Photo
+    saveCoverPic.addEventListener('click', function() {
+        if (coverPicInput.files && coverPicInput.files[0]) {
+            const file = coverPicInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Update cover photo
+                const coverPhoto = document.querySelector('.cover-photo img');
+                coverPhoto.src = e.target.result;
+                
+                // Save to localStorage
+                localStorage.setItem('kentbook_cover_pic', e.target.result);
+                
+                closeModals();
+                showNotification('Cover photo updated successfully!');
+            }
+            
+            reader.readAsDataURL(file);
+        }
     });
-  });
-
-  // Handle post options
-  const postOptionsBtns = document.querySelectorAll('.post-options-btn');
-  postOptionsBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      // In a real application, this would show a menu of options
-      alert('Post options menu would appear here');
+    
+    // Load saved cover photo
+    const savedCoverPic = localStorage.getItem('kentbook_cover_pic');
+    if (savedCoverPic) {
+        const coverPhoto = document.querySelector('.cover-photo img');
+        coverPhoto.src = savedCoverPic;
+    }
+    
+    // Utility function to show notifications
+    function showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1877f2;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === profilePicModal) {
+            profilePicModal.style.display = 'none';
+        }
+        if (e.target === coverPicModal) {
+            coverPicModal.style.display = 'none';
+        }
     });
-  });
 });

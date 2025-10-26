@@ -4,23 +4,39 @@
 
   App.User = Backbone.Model.extend({
     defaults: {
-      id: null,
-      name: "Anonymous",
-      email: "",
-      avatar: "",
-      isOnline: true
+        id: null,
+        name: "Anonymous",
+        email: "",
+        avatar: "",
+        isOnline: true
     },
     
     // Format for display in UI
     toDisplay: function() {
-      return {
-        name: this.get('name'),
-        avatar: this.get('avatar') || 'images/pp.png',
-        email: this.get('email'),
-        isOnline: this.get('isOnline')
-      };
+        // Get current profile picture from manager if available
+        let avatar = this.get('avatar');
+        if (typeof ProfilePictureManager !== 'undefined') {
+            const profileManager = ProfilePictureManager.getInstance();
+            const currentUserUsername = localStorage.getItem("kentbook_current_user");
+            const localStorageUsers = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+            const currentUserData = localStorageUsers.find(u => u.username === currentUserUsername);
+            
+            // If this is the current user, use the managed profile picture
+            if (currentUserData && 
+                (this.get('name') === currentUserData.name || 
+                 this.get('email') === currentUserData.email)) {
+                avatar = profileManager.getProfilePicture();
+            }
+        }
+        
+        return {
+            name: this.get('name'),
+            avatar: avatar || 'images/pp.png',
+            email: this.get('email'),
+            isOnline: this.get('isOnline')
+        };
     }
-  });
+});
 
   App.Users = Backbone.Collection.extend({
     model: App.User
