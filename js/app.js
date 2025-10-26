@@ -85,7 +85,7 @@
               id: userId,
               name: currentUserData.name || currentUserData.firstName + ' ' + currentUserData.lastName,
               email: currentUserData.email,
-              avatar: 'images/profile.png'
+              avatar: 'images/pp.png'
             });
             
             // Add to users collection

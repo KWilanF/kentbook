@@ -15,7 +15,7 @@
     toDisplay: function() {
       return {
         name: this.get('name'),
-        avatar: this.get('avatar') || 'images/profile.png',
+        avatar: this.get('avatar') || 'images/pp.png',
         email: this.get('email'),
         isOnline: this.get('isOnline')
       };
