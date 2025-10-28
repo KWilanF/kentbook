@@ -343,22 +343,266 @@
             </div>
           </div>
 
+          <!-- Mobile Chat Area -->
           <div class="chat-area">
-            <div class="empty-chat">
-              <div class="empty-chat-icon">💬</div>
-              <h2>Your Messages</h2>
-              <p>Send private messages to a friend or group.</p>
-              <button class="new-message-btn">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M14 2h-12c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10h-12v-8h12v8zm-8-6h-4v1h4v-1zm0 2h-4v1h4v-1zm0 2h-4v1h4v-1zm6-4h-4v1h4v-1zm0 2h-4v1h4v-1zm0 2h-4v1h4v-1z"/>
-                </svg>
-                New Message
-              </button>
+            <div class="chat-header">
+              <!-- Chat header will be populated by JavaScript -->
             </div>
+            <div class="messages-area">
+              <!-- Messages will be populated by JavaScript -->
+            </div>
+            <div class="message-input-area">
+              <div class="message-input-wrapper">
+                <button class="message-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                  </svg>
+                </button>
+                <input type="text" class="message-input" placeholder="Type a message...">
+                <button class="send-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Empty State -->
+          <div class="empty-chat-state">
+            <div class="empty-chat-icon">💬</div>
+            <h2>Your Messages</h2>
+            <p>Send private messages to a friend or group.</p>
+            <button class="new-message-btn">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M14 2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h12zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+              New Message
+            </button>
           </div>
         </div>
       </div>
     `
+  };
+
+  // Chat Widgets Manager
+  App.ChatWidgets = {
+    activeWidgets: new Map(),
+    widgetCounter: 0,
+
+    init: function() {
+      this.createWidgetsContainer();
+    },
+
+    createWidgetsContainer: function() {
+      // Remove existing container if any
+      const existingContainer = document.querySelector('.chat-widgets-container');
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+
+      // Create new container
+      const container = document.createElement('div');
+      container.className = 'chat-widgets-container';
+      document.body.appendChild(container);
+    },
+
+    openChat: function(conversation) {
+      // Check if chat is already open
+      const existingWidget = this.activeWidgets.get(conversation.id);
+      if (existingWidget) {
+        // Focus existing widget
+        this.focusWidget(conversation.id);
+        return;
+      }
+
+      // Create new widget
+      const widgetId = `chat-widget-${++this.widgetCounter}`;
+      const widget = this.createChatWidget(widgetId, conversation);
+      
+      // Add to container
+      const container = document.querySelector('.chat-widgets-container');
+      container.appendChild(widget);
+
+      // Store in active widgets
+      this.activeWidgets.set(conversation.id, {
+        element: widget,
+        conversation: conversation,
+        minimized: false
+      });
+
+      // Setup widget events
+      this.setupWidgetEvents(widgetId, conversation.id);
+    },
+
+    createChatWidget: function(widgetId, conversation) {
+      const widget = document.createElement('div');
+      widget.className = 'chat-widget active';
+      widget.id = widgetId;
+      widget.setAttribute('data-conversation-id', conversation.id);
+
+      widget.innerHTML = `
+        <div class="chat-widget-header">
+          <div class="chat-widget-header-info">
+            <img src="${conversation.avatar}" alt="${conversation.name}" class="chat-widget-avatar">
+            <span class="chat-widget-name">${conversation.name}</span>
+          </div>
+          <div class="chat-widget-actions">
+            <button class="chat-widget-btn minimize-btn" title="Minimize">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M14 8v1H3V8h11z"/>
+              </svg>
+            </button>
+            <button class="chat-widget-btn close-btn" title="Close">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="chat-widget-body">
+          <div class="chat-widget-messages">
+            ${conversation.messages.map(msg => `
+              <div class="chat-widget-message ${msg.sent ? 'sent' : 'received'}">
+                <div class="message-text">${msg.text}</div>
+                <div class="message-time">${msg.time}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="chat-widget-input-area">
+            <div class="chat-widget-input-wrapper">
+              <input type="text" class="chat-widget-input" placeholder="Type a message...">
+              <button class="chat-widget-send-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.5.5 0 0 0-.082.887l.52.52a.5.5 0 0 0 .566.047l4.56-2.28 2.28 4.56a.5.5 0 0 0 .47.28.5.5 0 0 0 .047-.566l-2.28-4.56 4.56-2.28a.5.5 0 0 0 .047-.566l-.52-.52a.5.5 0 0 0-.887-.082L15.964.686z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      return widget;
+    },
+
+    setupWidgetEvents: function(widgetId, conversationId) {
+      const widget = document.getElementById(widgetId);
+      if (!widget) return;
+
+      const widgetData = this.activeWidgets.get(parseInt(conversationId));
+      if (!widgetData) return;
+
+      // Minimize button
+      const minimizeBtn = widget.querySelector('.minimize-btn');
+      minimizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleMinimize(conversationId);
+      });
+
+      // Close button
+      const closeBtn = widget.querySelector('.close-btn');
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeChat(conversationId);
+      });
+
+      // Header click to restore
+      const header = widget.querySelector('.chat-widget-header');
+      header.addEventListener('click', (e) => {
+        if (widgetData.minimized) {
+          this.toggleMinimize(conversationId);
+        }
+      });
+
+      // Send message functionality
+      const input = widget.querySelector('.chat-widget-input');
+      const sendBtn = widget.querySelector('.chat-widget-send-btn');
+      const messagesArea = widget.querySelector('.chat-widget-messages');
+
+      const sendMessage = () => {
+        const text = input.value.trim();
+        if (text) {
+          const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+          const messageHTML = `
+            <div class="chat-widget-message sent">
+              <div class="message-text">${text}</div>
+              <div class="message-time">${currentTime}</div>
+            </div>
+          `;
+          
+          messagesArea.innerHTML += messageHTML;
+          input.value = '';
+          messagesArea.scrollTop = messagesArea.scrollHeight;
+
+          // Auto-reply after 1 second
+          setTimeout(() => {
+            const replies = [
+              "That's interesting!",
+              "Tell me more about that.",
+              "I see what you mean.",
+              "Thanks for sharing!",
+              "That's great to hear!"
+            ];
+            const randomReply = replies[Math.floor(Math.random() * replies.length)];
+            
+            const replyHTML = `
+              <div class="chat-widget-message received">
+                <div class="message-text">${randomReply}</div>
+                <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              </div>
+            `;
+            
+            messagesArea.innerHTML += replyHTML;
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+          }, 1000);
+        }
+      };
+
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    },
+
+    toggleMinimize: function(conversationId) {
+      const widgetData = this.activeWidgets.get(conversationId);
+      if (!widgetData) return;
+
+      const widget = widgetData.element;
+      widgetData.minimized = !widgetData.minimized;
+
+      if (widgetData.minimized) {
+        widget.classList.add('minimized');
+      } else {
+        widget.classList.remove('minimized');
+      }
+    },
+
+    closeChat: function(conversationId) {
+      const widgetData = this.activeWidgets.get(conversationId);
+      if (!widgetData) return;
+
+      widgetData.element.remove();
+      this.activeWidgets.delete(conversationId);
+    },
+
+    focusWidget: function(conversationId) {
+      const widgetData = this.activeWidgets.get(conversationId);
+      if (!widgetData) return;
+
+      // Remove minimized state if minimized
+      if (widgetData.minimized) {
+        this.toggleMinimize(conversationId);
+      }
+
+      // Move widget to end of container (bring to front)
+      const container = document.querySelector('.chat-widgets-container');
+      container.appendChild(widgetData.element);
+    }
   };
 
   // Header functionality
@@ -372,6 +616,9 @@
       this.bindNavigationButtons();
       this.bindTopbarIcons();
       this.bindSidebarNavigation();
+      
+      // Initialize chat widgets
+      App.ChatWidgets.init();
       
       // Initial page load
       this.handleRoute();
@@ -652,7 +899,12 @@
           online: true,
           lastMessage: "Hey! How are you doing?",
           time: "10:30 AM",
-          unread: 2
+          unread: 2,
+          messages: [
+            { id: 1, text: "Hey there! 👋", time: "10:25 AM", sent: false },
+            { id: 2, text: "How's your day going?", time: "10:26 AM", sent: false },
+            { id: 3, text: "Pretty good! Just working on some projects. How about you?", time: "10:28 AM", sent: true }
+          ]
         },
         {
           id: 2,
@@ -661,7 +913,11 @@
           online: true,
           lastMessage: "Let's meet up this weekend!",
           time: "Yesterday",
-          unread: 0
+          unread: 0,
+          messages: [
+            { id: 1, text: "Are we still on for Saturday?", time: "Yesterday", sent: true },
+            { id: 2, text: "Yes! Looking forward to it. 7 PM at the usual place?", time: "Yesterday", sent: false }
+          ]
         },
         {
           id: 3,
@@ -670,7 +926,11 @@
           online: false,
           lastMessage: "Thanks for helping me with the project!",
           time: "2 days ago",
-          unread: 0
+          unread: 0,
+          messages: [
+            { id: 1, text: "I really appreciate your help with the project!", time: "2 days ago", sent: false },
+            { id: 2, text: "No problem! Happy to help anytime.", time: "2 days ago", sent: true }
+          ]
         },
         {
           id: 4,
@@ -679,12 +939,260 @@
           online: true,
           lastMessage: "Did you see the new movie?",
           time: "3 days ago",
-          unread: 1
+          unread: 1,
+          messages: [
+            { id: 1, text: "Did you see the new Marvel movie?", time: "3 days ago", sent: false },
+            { id: 2, text: "Not yet! Is it good?", time: "3 days ago", sent: true }
+          ]
         }
       ];
 
       this.renderConversations(conversationsData);
       this.setupMessagesEvents();
+    },
+
+    // Setup messages events - UPDATED FOR MOBILE
+    setupMessagesEvents: function() {
+      const conversationItems = document.querySelectorAll('.conversation-item');
+      const newMessageBtn = document.querySelector('.new-message-btn');
+      const backButton = document.querySelector('.back-to-conversations');
+
+      conversationItems.forEach(item => {
+        item.addEventListener('click', () => {
+          // Remove active class from all items
+          conversationItems.forEach(i => i.classList.remove('active'));
+          // Add active class to clicked item
+          item.classList.add('active');
+          
+          const conversationId = item.getAttribute('data-conversation-id');
+          
+          // Check if mobile view
+          if (window.innerWidth <= 900) {
+            // For mobile: show the chat area
+            this.showMobileChat(conversationId);
+          } else {
+            // For desktop: use chat widgets
+            this.openChat(conversationId);
+          }
+        });
+      });
+
+      // Back button for mobile chat
+      if (backButton) {
+        backButton.addEventListener('click', () => {
+          this.hideMobileChat();
+        });
+      }
+
+      if (newMessageBtn) {
+        newMessageBtn.addEventListener('click', function() {
+          alert('New message feature would open a friend list to select from');
+        });
+      }
+    },
+
+    // Show mobile chat - NEW METHOD
+    showMobileChat: function(conversationId) {
+      const chatArea = document.querySelector('.chat-area');
+      const conversationsSidebar = document.querySelector('.conversations-sidebar');
+      const emptyChatState = document.querySelector('.empty-chat-state');
+      
+      if (chatArea && conversationsSidebar) {
+        // Hide conversations sidebar and empty state
+        conversationsSidebar.style.display = 'none';
+        if (emptyChatState) emptyChatState.style.display = 'none';
+        
+        // Show chat area
+        chatArea.style.display = 'flex';
+        chatArea.classList.add('active');
+        
+        // Load the chat content
+        this.loadMobileChatContent(conversationId);
+        
+        // Add active class to messages page for header visibility
+        document.querySelector('.messages-page')?.classList.add('chat-active');
+      }
+    },
+
+    // Hide mobile chat - NEW METHOD
+    hideMobileChat: function() {
+      const chatArea = document.querySelector('.chat-area');
+      const conversationsSidebar = document.querySelector('.conversations-sidebar');
+      const emptyChatState = document.querySelector('.empty-chat-state');
+      
+      if (chatArea && conversationsSidebar) {
+        // Show conversations sidebar and empty state
+        conversationsSidebar.style.display = 'block';
+        if (emptyChatState) emptyChatState.style.display = 'flex';
+        
+        // Hide chat area
+        chatArea.style.display = 'none';
+        chatArea.classList.remove('active');
+        
+        // Remove active class
+        document.querySelector('.messages-page')?.classList.remove('chat-active');
+      }
+    },
+
+    // Load mobile chat content - NEW METHOD
+    loadMobileChatContent: function(conversationId) {
+      const conversations = [
+        {
+          id: 1,
+          name: "Alice Cooper",
+          avatar: "https://randomuser.me/api/portraits/women/33.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Hey there! 👋", time: "10:25 AM", sent: false },
+            { id: 2, text: "How's your day going?", time: "10:26 AM", sent: false },
+            { id: 3, text: "Pretty good! Just working on some projects. How about you?", time: "10:28 AM", sent: true }
+          ]
+        },
+        {
+          id: 2,
+          name: "Mark Wilson",
+          avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Are we still on for Saturday?", time: "Yesterday", sent: true },
+            { id: 2, text: "Yes! Looking forward to it. 7 PM at the usual place?", time: "Yesterday", sent: false }
+          ]
+        },
+        {
+          id: 3,
+          name: "John Davis",
+          avatar: "https://randomuser.me/api/portraits/men/67.jpg",
+          online: false,
+          messages: [
+            { id: 1, text: "I really appreciate your help with the project!", time: "2 days ago", sent: false },
+            { id: 2, text: "No problem! Happy to help anytime.", time: "2 days ago", sent: true }
+          ]
+        },
+        {
+          id: 4,
+          name: "Emma Roberts",
+          avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Did you see the new Marvel movie?", time: "3 days ago", sent: false },
+            { id: 2, text: "Not yet! Is it good?", time: "3 days ago", sent: true }
+          ]
+        }
+      ];
+
+      const conversation = conversations.find(conv => conv.id === parseInt(conversationId));
+      if (!conversation) return;
+
+      const chatArea = document.querySelector('.chat-area');
+      if (!chatArea) return;
+
+      // Update chat header
+      const chatHeader = chatArea.querySelector('.chat-header');
+      if (chatHeader) {
+        chatHeader.innerHTML = `
+          <button class="back-to-conversations">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+          </button>
+          <img src="${conversation.avatar}" alt="${conversation.name}" class="chat-avatar">
+          <div class="chat-header-info">
+            <div class="chat-header-name">${conversation.name}</div>
+            <div class="chat-header-status">${conversation.online ? 'Online' : 'Offline'}</div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="chat-header-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+            </button>
+          </div>
+        `;
+      }
+
+      // Update messages area
+      const messagesArea = chatArea.querySelector('.messages-area');
+      if (messagesArea) {
+        messagesArea.innerHTML = conversation.messages.map(msg => `
+          <div class="message ${msg.sent ? 'sent' : 'received'}">
+            <div class="message-text">${msg.text}</div>
+            <div class="message-time">${msg.time}</div>
+          </div>
+        `).join('');
+        
+        // Scroll to bottom
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      }
+
+      // Setup send functionality
+      this.setupMobileChatSend(conversationId);
+      
+      // Re-attach back button event
+      const newBackButton = chatArea.querySelector('.back-to-conversations');
+      if (newBackButton) {
+        newBackButton.addEventListener('click', () => {
+          this.hideMobileChat();
+        });
+      }
+    },
+
+    // Setup mobile chat send functionality - NEW METHOD
+    setupMobileChatSend: function(conversationId) {
+      const input = document.querySelector('.message-input');
+      const sendBtn = document.querySelector('.send-btn');
+      const messagesArea = document.querySelector('.messages-area');
+
+      const sendMessage = () => {
+        const text = input.value.trim();
+        if (text) {
+          const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+          const messageHTML = `
+            <div class="message sent">
+              <div class="message-text">${text}</div>
+              <div class="message-time">${currentTime}</div>
+            </div>
+          `;
+          
+          messagesArea.innerHTML += messageHTML;
+          input.value = '';
+          messagesArea.scrollTop = messagesArea.scrollHeight;
+
+          // Auto-reply after 1 second
+          setTimeout(() => {
+            const replies = [
+              "That's interesting!",
+              "Tell me more about that.",
+              "I see what you mean.",
+              "Thanks for sharing!",
+              "That's great to hear!"
+            ];
+            const randomReply = replies[Math.floor(Math.random() * replies.length)];
+            
+            const replyHTML = `
+              <div class="message received">
+                <div class="message-text">${randomReply}</div>
+                <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              </div>
+            `;
+            
+            messagesArea.innerHTML += replyHTML;
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+          }, 1000);
+        }
+      };
+
+      if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+      }
+      
+      if (input) {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        });
+      }
     },
 
     // Initialize Video Players for Watch Page
@@ -845,33 +1353,8 @@
       `).join('');
     },
 
-    // Setup messages events
-    setupMessagesEvents: function() {
-      const conversationItems = document.querySelectorAll('.conversation-item');
-      const newMessageBtn = document.querySelector('.new-message-btn');
-
-      conversationItems.forEach(item => {
-        item.addEventListener('click', () => {
-          // Remove active class from all items
-          conversationItems.forEach(i => i.classList.remove('active'));
-          // Add active class to clicked item
-          item.classList.add('active');
-          
-          const conversationId = item.getAttribute('data-conversation-id');
-          this.openChat(conversationId);
-        });
-      });
-
-      if (newMessageBtn) {
-        newMessageBtn.addEventListener('click', function() {
-          alert('New message feature would open a friend list to select from');
-        });
-      }
-    },
-
-    // Open chat function
+    // Open chat function - now uses desktop widgets
     openChat: function(conversationId) {
-      const chatArea = document.querySelector('.chat-area');
       const conversations = [
         {
           id: 1,
@@ -893,88 +1376,34 @@
             { id: 1, text: "Are we still on for Saturday?", time: "Yesterday", sent: true },
             { id: 2, text: "Yes! Looking forward to it. 7 PM at the usual place?", time: "Yesterday", sent: false }
           ]
+        },
+        {
+          id: 3,
+          name: "John Davis",
+          avatar: "https://randomuser.me/api/portraits/men/67.jpg",
+          online: false,
+          messages: [
+            { id: 1, text: "I really appreciate your help with the project!", time: "2 days ago", sent: false },
+            { id: 2, text: "No problem! Happy to help anytime.", time: "2 days ago", sent: true }
+          ]
+        },
+        {
+          id: 4,
+          name: "Emma Roberts",
+          avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Did you see the new Marvel movie?", time: "3 days ago", sent: false },
+            { id: 2, text: "Not yet! Is it good?", time: "3 days ago", sent: true }
+          ]
         }
       ];
 
       const conversation = conversations.find(conv => conv.id === parseInt(conversationId));
       if (!conversation) return;
 
-      chatArea.innerHTML = `
-        <div class="chat-header">
-          <img src="${conversation.avatar}" alt="${conversation.name}" class="chat-avatar">
-          <div class="chat-header-info">
-            <div class="chat-header-name">${conversation.name}</div>
-            <div class="chat-header-status">${conversation.online ? 'Online' : 'Last seen recently'}</div>
-          </div>
-          <div class="chat-header-actions">
-            <button class="chat-header-btn" title="Video call">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2 6c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm14 0H4v8h12V6zM8 7l5 3-5 3V7z"/>
-              </svg>
-            </button>
-            <button class="chat-header-btn" title="Audio call">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a6 6 0 0 0-6 6v3.5l-2 2v1h16v-1l-2-2V8a6 6 0 0 0-6-6zm0 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="messages-area">
-          ${conversation.messages.map(msg => `
-            <div class="message ${msg.sent ? 'sent' : 'received'}">
-              <div class="message-text">${msg.text}</div>
-              <div class="message-time">${msg.time}</div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="message-input-area">
-          <div class="message-input-wrapper">
-            <button class="message-action-btn">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13zM7 8.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-7 5h8v1H6v-1z"/>
-              </svg>
-            </button>
-            <input type="text" class="message-input" placeholder="Type a message...">
-            <button class="send-btn">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2 10l5 5 11-11-1.5-1.5L7 12 3.5 8.5 2 10z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      `;
-
-      // Add event listener for sending messages
-      const messageInput = chatArea.querySelector('.message-input');
-      const sendBtn = chatArea.querySelector('.send-btn');
-
-      if (messageInput && sendBtn) {
-        const sendMessage = () => {
-          const text = messageInput.value.trim();
-          if (text) {
-            const messagesArea = chatArea.querySelector('.messages-area');
-            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const messageHTML = `
-              <div class="message sent">
-                <div class="message-text">${text}</div>
-                <div class="message-time">${currentTime}</div>
-              </div>
-            `;
-            
-            messagesArea.innerHTML += messageHTML;
-            messageInput.value = '';
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-          }
-        };
-
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-            sendMessage();
-          }
-        });
-      }
+      // Use desktop chat widgets
+      App.ChatWidgets.openChat(conversation);
     },
 
     // Setup tabs for different pages
@@ -1116,6 +1545,13 @@
       const dropdownMenu = document.querySelector('.dropdown-menu');
       if (dropdownMenu) {
         dropdownMenu.style.display = 'none';
+      }
+
+      // Close all chat widgets
+      App.ChatWidgets.activeWidgets.clear();
+      const widgetsContainer = document.querySelector('.chat-widgets-container');
+      if (widgetsContainer) {
+        widgetsContainer.innerHTML = '';
       }
     },
 
