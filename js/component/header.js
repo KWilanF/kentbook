@@ -107,7 +107,173 @@
         </div>
 
         <div class="video-grid" id="video-grid">
-          <!-- Videos will be populated by JavaScript -->
+          <!-- Video 1: Nature Documentary -->
+          <div class="video-card">
+            <div class="video-container">
+              <video class="video-player" poster="https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="video-overlay">
+                <button class="play-btn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <div class="video-duration">2:45</div>
+              </div>
+            </div>
+            <div class="video-info">
+              <div class="video-meta">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Nature Channel" class="channel-avatar">
+                <div class="video-details">
+                  <h3 class="video-title">Amazing Nature Documentary - Wildlife in 4K</h3>
+                  <p class="channel-name">Nature Channel</p>
+                  <p class="video-stats">1.2M views · 2 days ago</p>
+                </div>
+              </div>
+              <div class="video-actions">
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  <span>15K</span>
+                </button>
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 2: IT Programming Tutorial -->
+          <div class="video-card">
+            <div class="video-container">
+              <video class="video-player" poster="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="video-overlay">
+                <button class="play-btn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <div class="video-duration">8:32</div>
+              </div>
+            </div>
+            <div class="video-info">
+              <div class="video-meta">
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Code Master" class="channel-avatar">
+                <div class="video-details">
+                  <h3 class="video-title">JavaScript Tutorial: Building a Modern Web App</h3>
+                  <p class="channel-name">Code Master</p>
+                  <p class="video-stats">850K views · 1 week ago</p>
+                </div>
+              </div>
+              <div class="video-actions">
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  <span>42K</span>
+                </button>
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 3: Tech Review -->
+          <div class="video-card">
+            <div class="video-container">
+              <video class="video-player" poster="https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="video-overlay">
+                <button class="play-btn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <div class="video-duration">4:12</div>
+              </div>
+            </div>
+            <div class="video-info">
+              <div class="video-meta">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Tech Reviews" class="channel-avatar">
+                <div class="video-details">
+                  <h3 class="video-title">New MacBook Pro M3 Review - Is It Worth It?</h3>
+                  <p class="channel-name">Tech Reviews</p>
+                  <p class="video-stats">2.1M views · 3 days ago</p>
+                </div>
+              </div>
+              <div class="video-actions">
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  <span>28K</span>
+                </button>
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 4: AI & Machine Learning -->
+          <div class="video-card">
+            <div class="video-container">
+              <video class="video-player" poster="https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="video-overlay">
+                <button class="play-btn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <div class="video-duration">12:45</div>
+              </div>
+            </div>
+            <div class="video-info">
+              <div class="video-meta">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="AI Insights" class="channel-avatar">
+                <div class="video-details">
+                  <h3 class="video-title">Machine Learning Explained for Beginners</h3>
+                  <p class="channel-name">AI Insights</p>
+                  <p class="video-stats">950K views · 5 days ago</p>
+                </div>
+              </div>
+              <div class="video-actions">
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  <span>36K</span>
+                </button>
+                <button class="video-action-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     `,
@@ -255,7 +421,7 @@
         console.error('Page template not found:', page);
       }
     },
-
+    
     // Show home page (default content from index.html)
     showHomePage: function() {
       console.log('Showing home page');
@@ -395,22 +561,8 @@
     // Initialize Watch Page
     initializeWatchPage: function() {
       console.log('Initializing watch page');
-      const videosData = [
-        { 
-          title: 'Amazing Nature Documentary - Wildlife in 4K', 
-          views: '1.2M', 
-          duration: '15:30', 
-          thumbnail: 'https://picsum.photos/400/225?nature', 
-          creator: 'Nature World',
-          creatorAvatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-          likes: '45K',
-          comments: '2.1K',
-          isLive: false
-        }
-      ];
-
-      this.renderVideos(videosData);
       this.setupTabs('.watch-tabs', 'watch-tab');
+      this.initializeVideoPlayers();
     },
 
     // Initialize Marketplace Page
@@ -535,6 +687,48 @@
       this.setupMessagesEvents();
     },
 
+    // Initialize Video Players for Watch Page
+    initializeVideoPlayers: function() {
+      const videoContainers = document.querySelectorAll('.video-container');
+      
+      videoContainers.forEach(container => {
+        const video = container.querySelector('.video-player');
+        const playBtn = container.querySelector('.play-btn');
+        const overlay = container.querySelector('.video-overlay');
+        
+        if (video && playBtn && overlay) {
+          // Play/pause functionality
+          const togglePlay = () => {
+            if (video.paused) {
+              video.play();
+              container.classList.add('playing');
+            } else {
+              video.pause();
+              container.classList.remove('playing');
+            }
+          };
+          
+          playBtn.addEventListener('click', togglePlay);
+          container.addEventListener('click', togglePlay);
+          
+          // Pause other videos when one starts playing
+          video.addEventListener('play', () => {
+            document.querySelectorAll('.video-player').forEach(otherVideo => {
+              if (otherVideo !== video && !otherVideo.paused) {
+                otherVideo.pause();
+                otherVideo.closest('.video-container')?.classList.remove('playing');
+              }
+            });
+          });
+          
+          // Handle video ended
+          video.addEventListener('ended', () => {
+            container.classList.remove('playing');
+          });
+        }
+      });
+    },
+
     // Render methods for different pages
     renderFriendRequests: function(requests) {
       const requestsGrid = document.getElementById('requests-grid');
@@ -576,40 +770,6 @@
             <h4 class="suggestion-name">${suggestion.name}</h4>
             <p class="mutual-count">${suggestion.mutual} mutual friend${suggestion.mutual > 1 ? 's' : ''}</p>
             <button class="add-friend-btn">Add Friend</button>
-          </div>
-        </div>
-      `).join('');
-    },
-
-    renderVideos: function(videos) {
-      const videoGrid = document.getElementById('video-grid');
-      if (!videoGrid) {
-        console.error('Video grid not found');
-        return;
-      }
-
-      videoGrid.innerHTML = videos.map(video => `
-        <div class="video-card">
-          <div class="video-thumbnail">
-            <img src="${video.thumbnail}" alt="${video.title}">
-            ${video.isLive ? 
-              '<div class="live-badge">LIVE</div>' : 
-              `<div class="video-duration">${video.duration}</div>`
-            }
-          </div>
-          <div class="video-info">
-            <div class="video-creator">
-              <img src="${video.creatorAvatar}" alt="${video.creator}" class="creator-avatar">
-              <div class="creator-info">
-                <h4>${video.creator}</h4>
-                <p>${video.views} views</p>
-              </div>
-            </div>
-            <h3 class="video-title">${video.title}</h3>
-            <div class="video-stats">
-              <span>${video.likes} likes</span>
-              <span>${video.comments} comments</span>
-            </div>
           </div>
         </div>
       `).join('');
@@ -691,13 +851,13 @@
       const newMessageBtn = document.querySelector('.new-message-btn');
 
       conversationItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', () => {
           // Remove active class from all items
           conversationItems.forEach(i => i.classList.remove('active'));
           // Add active class to clicked item
-          this.classList.add('active');
+          item.classList.add('active');
           
-          const conversationId = this.getAttribute('data-conversation-id');
+          const conversationId = item.getAttribute('data-conversation-id');
           this.openChat(conversationId);
         });
       });
@@ -849,7 +1009,7 @@
       console.log(`${type} tab changed to:`, tab);
     },
 
-    // Bind navigation buttons - REMOVED MESSAGES REDIRECT
+    // Bind navigation buttons
     bindNavigationButtons: function() {
       // Messages button now handled by the router
       // No need for special handling since it's integrated like other pages
@@ -959,7 +1119,7 @@
       }
     },
 
-    // Bind topbar icon clicks - FIXED VERSION
+    // Bind topbar icon clicks
     bindTopbarIcons: function() {
       console.log('Binding topbar icons...');
       
@@ -997,7 +1157,7 @@
       console.log('Topbar icons bound successfully');
     },
 
-    // Bind sidebar navigation - FIXED VERSION
+    // Bind sidebar navigation
     bindSidebarNavigation: function() {
       console.log('Binding sidebar navigation...');
       
