@@ -224,27 +224,32 @@
     <!-- ===== TOP NAVBAR ===== -->
     <header class="topbar">
       <div class="center-icons">
-        <button class="icon-btn active" title="Home">
+        <button class="icon-btn active" title="Home" data-route="home">
           <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
             <path d="M25 13L14 3 3 13h3v10h5V16h6v7h5V13h3z"/>
           </svg>
         </button>
-        <button class="icon-btn" title="Friends">
+        <button class="icon-btn" title="Friends" data-route="friends">
           <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
             <path d="M16 14a4 4 0 1 0-8 0c0 2.21 1.79 4 4 4s4-1.79 4-4zm-8 5c-3 0-6 1.34-6 4v2h20v-2c0-2.66-3-4-6-4H8zM22 13h2v-2h-2V9h-2v2h-2v2h2v2h2v-2z"/>
           </svg>
         </button>
-        <button class="icon-btn" title="Watch">
+        <button class="icon-btn" title="Messages">
+          <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
+            <path d="M14 2.042c6.76 0 12 4.952 12 11.64s-5.24 11.64-12 11.64c-1.1 0-2.17-.15-3.19-.43a.96.96 0 0 0-.64.05l-2.39 1.05a.96.96 0 0 1-1.35-.85l-.07-2.14a.97.97 0 0 0-.32-.68A11.39 11.39 0 0 1 2 13.682c0-6.688 5.24-11.64 12-11.64zM8 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+          </svg>
+        </button>
+        <button class="icon-btn" title="Watch" data-route="watch">
           <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
             <path d="M4 6h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm8 4v8l6-4-6-4z"/>
           </svg>
         </button>
-        <button class="icon-btn" title="Marketplace">
+        <button class="icon-btn" title="Marketplace" data-route="marketplace">
           <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
             <path d="M18 12v-2a4 4 0 0 0-8 0v2H4v10h20V12h-6zm-6-2a2 2 0 0 1 4 0v2h-4v-2zm8 6h-4v2h-4v-2H8v-2h12v2z"/>
           </svg>
         </button>
-        <button class="icon-btn" title="Groups">
+        <button class="icon-btn" title="Groups" data-route="groups">
           <svg class="icon" viewBox="0 0 28 28" fill="currentColor">
             <path d="M7 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm14 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
           </svg>
@@ -268,7 +273,7 @@
         </div>
 
         <ul>
-          <li>
+          <li data-route="friends">
             <div class="sidebar-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M16 14a4 4 0 1 0-8 0c0 2.21 1.79 4 4 4s4-1.79 4-4zm-8 5c-3 0-6 1.34-6 4v2h20v-2c0-2.66-3-4-6-4H8zM22 13h2v-2h-2V9h-2v2h-2v2h2v2h2v-2z"/>
@@ -276,7 +281,7 @@
             </div>
             Friends
           </li>
-          <li>
+          <li data-route="watch">
             <div class="sidebar-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M4 6h12v2H4V6zm0 4h12v2H4v-2zm0 4h12v2H4v-2z"/>
@@ -308,7 +313,7 @@
             </div>
             Saved
           </li>
-          <li>
+          <li data-route="groups">
             <div class="sidebar-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M7 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm14 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -324,7 +329,7 @@
             </div>
             Video
           </li>
-          <li>
+          <li data-route="marketplace">
             <div class="sidebar-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M18 12v-2a4 4 0 0 0-8 0v2H4v10h20V12h-6zm-6-2a2 2 0 0 1 4 0v2h-4v-2zm8 6h-4v2h-4v-2H8v-2h12v2z"/>
@@ -355,65 +360,50 @@
         </ul>
       </aside>
 
-      <!-- CENTER FEED -->
+      <!-- CENTER FEED - UPDATED STRUCTURE -->
       <section class="feed">
-        <!-- STORIES -->
-        <div class="stories-row">
-          <div class="story create-story">
-            <img src="images/pp.png" alt="Create Story" />
-            <div class="plus-icon">+</div>
-            <p>Create Story</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Tom" />
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Tom" class="story-avatar" />
-            <p>dodo</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Sarah" />
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Sarah" class="story-avatar" />
-            <p>partner</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Mike" />
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Mike" class="story-avatar" />
-            <p>kuya do</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Emily" />
-            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Emily" class="story-avatar" />
-            <p>wilan</p>
-          </div>
-            <div class="story">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Tom" />
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Tom" class="story-avatar" />
-            <p>Tom</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Sarah" />
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Sarah" class="story-avatar" />
-            <p>Sarah</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Mike" />
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Mike" class="story-avatar" />
-            <p>Mike</p>
-          </div>
-          <div class="story">
-            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Emily" />
-            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Emily" class="story-avatar" />
-            <p>Emily</p>
-          </div>
-        </div>
+        <div class="main-content">
+          <!-- Home page content will be loaded here by default -->
+          <div class="page-content home-page">
+            <!-- STORIES -->
+            <div class="stories-row">
+              <div class="story create-story">
+                <img src="images/pp.png" alt="Create Story" />
+                <div class="plus-icon">+</div>
+                <p>Create Story</p>
+              </div>
+              <div class="story">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Tom" />
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Tom" class="story-avatar" />
+                <p>dodo</p>
+              </div>
+              <div class="story">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Sarah" />
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Sarah" class="story-avatar" />
+                <p>partner</p>
+              </div>
+              <div class="story">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Mike" />
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Mike" class="story-avatar" />
+                <p>kuya do</p>
+              </div>
+              <div class="story">
+                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Emily" />
+                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Emily" class="story-avatar" />
+                <p>wilan</p>
+              </div>
+            </div>
 
-        <!-- COMPOSER -->
-        <div id="composer" class="card">
-          <!-- Composer content will be rendered by Backbone -->
-        </div>
+            <!-- COMPOSER -->
+            <div id="composer" class="card">
+              <!-- Composer content will be rendered by Backbone -->
+            </div>
 
-        <!-- FEED POSTS -->
-        <div id="feed">
-          <!-- Posts will be rendered by Backbone -->
+            <!-- FEED POSTS -->
+            <div id="feed">
+              <!-- Posts will be rendered by Backbone -->
+            </div>
+          </div>
         </div>
       </section>
 
@@ -491,6 +481,6 @@
   <script src="js/app.js"></script>
   <script src="js/component/header.js"></script>
   <script src="js/component/login.js"></script>
-<script src="js/component/profileManager.js"></script>
+  <script src="js/component/profileManager.js"></script>
 </body>
 </html>
