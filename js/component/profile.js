@@ -470,7 +470,7 @@ function updateIntroSection(user) {
     }
 }
 
-// Function to initialize profile posts
+// Function to initialize profile posts - FIXED VERSION
 function initializeProfilePosts() {
     const currentUsername = localStorage.getItem("kentbook_current_user");
     const users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
@@ -486,19 +486,30 @@ function initializeProfilePosts() {
     const posts = appData.posts || [];
     
     console.log('Total posts found:', posts.length);
+    console.log('Current username:', currentUsername);
     
-    // Filter posts by current user - FIXED LOGIC
+    // Filter posts by current user - CORRECTED LOGIC
     const userPosts = posts.filter(post => {
-        // Get the current user's ID from localStorage users
-        const currentUserData = users.find(u => u.username === currentUsername);
-        if (!currentUserData) return false;
+        // Match by username (most reliable)
+        if (post.user_username === currentUsername) {
+            return true;
+        }
         
-        // Simple matching: if post has user_id 1 or matches current user's name
-        return post.user_id === 1 || 
-               (currentUserData.name && post.body && post.body.includes(currentUserData.name));
+        // Match by user_id (for legacy posts)
+        if (post.user_id === 1) {
+            return true;
+        }
+        
+        // Match by name (fallback)
+        if (currentUser.name && post.user_name === currentUser.name) {
+            return true;
+        }
+        
+        return false;
     });
     
-    console.log('User posts found:', userPosts.length);
+    console.log('User posts found after filtering:', userPosts.length);
+    userPosts.forEach(post => console.log('Post:', post));
     
     // Update posts count
     const postsCountElement = document.getElementById('profilePostsCount');
@@ -506,34 +517,29 @@ function initializeProfilePosts() {
         postsCountElement.textContent = `${userPosts.length} posts`;
     }
     
+    // Remove loading indicator
+    const loadingPosts = document.getElementById('loadingPosts');
+    if (loadingPosts) {
+        loadingPosts.remove();
+    }
+    
     // Render user posts
     renderProfilePosts(userPosts, currentUser);
 }
 
-// Function to render profile posts
+// Function to render profile posts - ENHANCED VERSION
 function renderProfilePosts(posts, user) {
-    const profileRight = document.querySelector('.profile-right');
-    if (!profileRight) return;
-    
-    // Remove existing hardcoded posts (keep the create post card)
-    const existingPosts = profileRight.querySelectorAll('.post-card');
-    existingPosts.forEach(post => {
-        if (!post.classList.contains('create-post-card')) {
-            post.remove();
-        }
-    });
+    const profilePostsContainer = document.getElementById('profilePostsContainer');
+    if (!profilePostsContainer) {
+        console.error('Profile posts container not found!');
+        return;
+    }
     
     console.log('Rendering', posts.length, 'posts for user:', user.name);
     
-    // Add user's posts
-    posts.forEach(postData => {
-        const postElement = createPostElement(postData, user);
-        // Insert after the create post card
-        const createPostCard = profileRight.querySelector('.create-post-card');
-        if (createPostCard) {
-            createPostCard.insertAdjacentElement('afterend', postElement);
-        }
-    });
+    // Clear existing posts (except create post card)
+    const existingPosts = profilePostsContainer.querySelectorAll('.post-card:not(.create-post-card)');
+    existingPosts.forEach(post => post.remove());
     
     // If no posts, show empty state
     if (posts.length === 0) {
@@ -550,24 +556,40 @@ function renderProfilePosts(posts, user) {
                 <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
                 <h3 style="margin-bottom: 8px;">No posts yet</h3>
                 <p style="color: var(--muted);">Share your first post!</p>
+                <button class="action-btn primary" onclick="window.location.href='../index.html'" style="margin-top: 16px;">
+                    Create Your First Post
+                </button>
             </div>
         `;
-        
-        const createPostCard = profileRight.querySelector('.create-post-card');
-        if (createPostCard) {
-            createPostCard.insertAdjacentElement('afterend', emptyState);
-        }
+        profilePostsContainer.appendChild(emptyState);
+        return;
     }
+    
+    // Add user's posts
+    posts.forEach(postData => {
+        const postElement = createPostElement(postData, user);
+        profilePostsContainer.appendChild(postElement);
+    });
+    
+    // Initialize like functionality after posts are rendered
+    initializeLikeFunctionality();
 }
 
 // Function to create post element
 function createPostElement(postData, user) {
     const postElement = document.createElement('div');
     postElement.className = 'post-card';
+    postElement.setAttribute('data-post-id', postData.id);
     
     const timeAgo = getTimeAgo(postData.created_at);
     const profileManager = ProfilePictureManager.getInstance();
     const userAvatar = profileManager.getProfilePicture();
+    
+    // Check if post is liked by current user
+    const isLiked = postData.liked || false;
+    const likeButtonClass = isLiked ? 'post-action liked' : 'post-action';
+    const likeButtonText = isLiked ? 'Liked' : 'Like';
+    const likeIconColor = isLiked ? '#1877f2' : '#65676b';
     
     postElement.innerHTML = `
         <div class="post-header">
@@ -591,33 +613,260 @@ function createPostElement(postData, user) {
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="#ffffff">
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-5.03-2.76a.5.5 0 0 0-.97.24v4a.5.5 0 0 0 .97.24l1-4a.5.5 0 0 0 0-.48l-1-4zM4.5 6.5A.5.5 0 0 0 4 7v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5z"/>
                 </svg>
-                <span>${postData.likes || 0}</span>
+                <span class="likes-count">${postData.likes || 0}</span>
             </div>
             <div class="post-comments">${postData.comments || 0} comments · ${postData.shares || 0} shares</div>
         </div>
         <div class="post-actions">
-            <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
+            <button class="${likeButtonClass}" data-post-id="${postData.id}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="${likeIconColor}">
                     <path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H3v10h14.43c1.06 0 1.98-.67 2.19-1.61l1.34-6c.31-1.37-.73-2.39-2.19-2.39zM7 20H4v-8h3v8zm12.57-7l-1.34 6H9v-8l4.65-5.97C13.7 4.62 14.06 4.5 14.38 4.5c.28 0 .54.13.73.37l4.41 5.66.01.01.01-.01.02.01-1.99 7.99z"/>
                 </svg>
-                <span>Like</span>
+                <span>${likeButtonText}</span>
             </button>
-            <button class="post-action">
+            <button class="post-action comment-btn" data-post-id="${postData.id}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
                     <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
                 </svg>
                 <span>Comment</span>
             </button>
-            <button class="post-action">
+            <button class="post-action share-btn" data-post-id="${postData.id}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
                     <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
                 </svg>
                 <span>Share</span>
             </button>
         </div>
+        
+        <!-- Comments Section -->
+        <div class="comments-section" id="comments-${postData.id}" style="display: none;">
+            <div class="comment-input-container">
+                <img src="${userAvatar}" alt="Your profile" class="comment-user-avatar">
+                <div class="comment-input-wrapper">
+                    <input type="text" class="comment-input" placeholder="Write a comment..." data-post-id="${postData.id}">
+                    <div class="comment-actions">
+                        <button class="comment-emoji-btn" title="Emoji">😊</button>
+                        <button class="comment-photo-btn" title="Photo">📷</button>
+                    </div>
+                </div>
+            </div>
+            <div class="comments-list" id="comments-list-${postData.id}">
+                <!-- Comments will be loaded here dynamically -->
+            </div>
+        </div>
     `;
     
     return postElement;
+}
+
+// Initialize like functionality for posts
+function initializeLikeFunctionality() {
+    // Like buttons
+    const likeButtons = document.querySelectorAll('.post-action[data-post-id]');
+    
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const postId = this.getAttribute('data-post-id');
+            handleLikePost(postId, this);
+        });
+    });
+    
+    // Comment buttons - toggle comments section
+    const commentButtons = document.querySelectorAll('.comment-btn');
+    commentButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const postId = this.getAttribute('data-post-id');
+            toggleCommentsSection(postId);
+        });
+    });
+    
+    // Comment input functionality
+    const commentInputs = document.querySelectorAll('.comment-input');
+    commentInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const postId = this.getAttribute('data-post-id');
+                addComment(postId, this.value.trim());
+                this.value = '';
+            }
+        });
+    });
+}
+
+// Handle like/unlike post
+function handleLikePost(postId, likeButton) {
+    // Get current app data
+    const appData = JSON.parse(localStorage.getItem('kentbook_data_v1')) || {};
+    const posts = appData.posts || [];
+    
+    // Find the post
+    const postIndex = posts.findIndex(post => post.id === postId);
+    if (postIndex === -1) return;
+    
+    const post = posts[postIndex];
+    const currentLikes = post.likes || 0;
+    const isCurrentlyLiked = post.liked || false;
+    
+    // Toggle like status
+    if (isCurrentlyLiked) {
+        // Unlike
+        post.likes = Math.max(0, currentLikes - 1);
+        post.liked = false;
+        
+        // Update button appearance
+        likeButton.classList.remove('liked');
+        likeButton.querySelector('svg').setAttribute('fill', '#65676b');
+        likeButton.querySelector('span').textContent = 'Like';
+    } else {
+        // Like
+        post.likes = currentLikes + 1;
+        post.liked = true;
+        
+        // Update button appearance
+        likeButton.classList.add('liked');
+        likeButton.querySelector('svg').setAttribute('fill', '#1877f2');
+        likeButton.querySelector('span').textContent = 'Liked';
+    }
+    
+    // Update likes count in stats
+    const likesCount = likeButton.closest('.post-card').querySelector('.likes-count');
+    if (likesCount) {
+        likesCount.textContent = post.likes;
+    }
+    
+    // Save updated data
+    appData.posts = posts;
+    localStorage.setItem('kentbook_data_v1', JSON.stringify(appData));
+    
+    console.log(`Post ${postId} ${isCurrentlyLiked ? 'unliked' : 'liked'}. New likes: ${post.likes}`);
+}
+
+// Toggle comments section visibility
+function toggleCommentsSection(postId) {
+    const commentsSection = document.getElementById(`comments-${postId}`);
+    const commentsList = document.getElementById(`comments-list-${postId}`);
+    
+    if (commentsSection.style.display === 'none') {
+        // Show comments section and load comments
+        commentsSection.style.display = 'block';
+        loadComments(postId, commentsList);
+    } else {
+        // Hide comments section
+        commentsSection.style.display = 'none';
+    }
+}
+
+// Load comments for a post
+function loadComments(postId, commentsList) {
+    // Get comments from localStorage
+    const appData = JSON.parse(localStorage.getItem('kentbook_data_v1')) || {};
+    const comments = appData.comments || [];
+    
+    // Filter comments for this post
+    const postComments = comments.filter(comment => comment.post_id === postId);
+    
+    // Clear existing comments
+    commentsList.innerHTML = '';
+    
+    if (postComments.length === 0) {
+        commentsList.innerHTML = `
+            <div class="no-comments" style="text-align: center; padding: 20px; color: #65676b;">
+                No comments yet. Be the first to comment!
+            </div>
+        `;
+        return;
+    }
+    
+    // Add comments to the list
+    postComments.forEach(comment => {
+        const commentElement = createCommentElement(comment);
+        commentsList.appendChild(commentElement);
+    });
+}
+
+// Create comment element
+function createCommentElement(comment) {
+    const commentElement = document.createElement('div');
+    commentElement.className = 'comment';
+    commentElement.innerHTML = `
+        <img src="${comment.user_avatar || '../images/pp.png'}" alt="${comment.user_name}" class="comment-avatar">
+        <div class="comment-content">
+            <div class="comment-header">
+                <span class="comment-author">${comment.user_name}</span>
+                <span class="comment-time">${getTimeAgo(comment.created_at)}</span>
+            </div>
+            <div class="comment-text">${escapeHtml(comment.body)}</div>
+            <div class="comment-actions">
+                <button class="comment-like-btn" data-comment-id="${comment.id}">Like</button>
+                <span class="comment-likes">${comment.likes || 0}</span>
+            </div>
+        </div>
+    `;
+    return commentElement;
+}
+
+// Add a new comment
+function addComment(postId, commentText) {
+    const currentUsername = localStorage.getItem("kentbook_current_user");
+    const users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+    const currentUser = users.find(u => u.username === currentUsername);
+    
+    if (!currentUser) return;
+    
+    // Get current app data
+    const appData = JSON.parse(localStorage.getItem('kentbook_data_v1')) || {};
+    const posts = appData.posts || [];
+    const comments = appData.comments || [];
+    
+    // Find the post
+    const postIndex = posts.findIndex(post => post.id === postId);
+    if (postIndex === -1) return;
+    
+    // Create new comment
+    const newComment = {
+        id: 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        post_id: postId,
+        user_id: currentUser.id || 1,
+        user_name: currentUser.name,
+        user_username: currentUser.username,
+        user_avatar: ProfilePictureManager.getInstance().getProfilePicture(),
+        body: commentText,
+        likes: 0,
+        liked: false,
+        created_at: new Date().toISOString()
+    };
+    
+    // Add comment to comments array
+    comments.push(newComment);
+    
+    // Update post comment count
+    posts[postIndex].comments = (posts[postIndex].comments || 0) + 1;
+    
+    // Save updated data
+    appData.posts = posts;
+    appData.comments = comments;
+    localStorage.setItem('kentbook_data_v1', JSON.stringify(appData));
+    
+    // Refresh comments list
+    const commentsList = document.getElementById(`comments-list-${postId}`);
+    if (commentsList) {
+        loadComments(postId, commentsList);
+    }
+    
+    // Update comment count in post stats
+    const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+    if (postCard) {
+        const postStats = postCard.closest('.post-card').querySelector('.post-comments');
+        if (postStats) {
+            const currentComments = posts[postIndex].comments || 0;
+            const currentShares = posts[postIndex].shares || 0;
+            postStats.textContent = `${currentComments} comments · ${currentShares} shares`;
+        }
+    }
+    
+    console.log(`New comment added to post ${postId}:`, commentText);
 }
 
 // Helper function to calculate time ago
@@ -632,9 +881,9 @@ function getTimeAgo(createdAt) {
     const diffDays = Math.floor(diffMs / 86400000);
     
     if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return diffMins + ' mins';
-    if (diffHours < 24) return diffHours + ' hrs';
-    if (diffDays < 7) return diffDays + ' days';
+    if (diffMins < 60) return diffMins + ' min' + (diffMins === 1 ? '' : 's');
+    if (diffHours < 24) return diffHours + ' hr' + (diffHours === 1 ? '' : 's');
+    if (diffDays < 7) return diffDays + ' day' + (diffDays === 1 ? '' : 's');
     return created.toLocaleDateString();
 }
 
@@ -664,3 +913,34 @@ function setupProfilePostCreation() {
         });
     });
 }
+
+// Debug function to check post data
+function debugPostData() {
+    const currentUsername = localStorage.getItem("kentbook_current_user");
+    const users = JSON.parse(localStorage.getItem("kentbook_users")) || [];
+    const currentUser = users.find(u => u.username === currentUsername);
+    
+    console.log('=== DEBUG POST DATA ===');
+    console.log('Current User:', currentUser);
+    
+    const appData = JSON.parse(localStorage.getItem('kentbook_data_v1')) || {};
+    const posts = appData.posts || [];
+    
+    console.log('All Posts:', posts);
+    console.log('Posts with user_username:', posts.filter(p => p.user_username));
+    console.log('Posts with user_id 1:', posts.filter(p => p.user_id === 1));
+    
+    // Check if welcome post exists
+    const welcomePost = posts.find(p => p.body && p.body.includes('Welcome to KentBook'));
+    console.log('Welcome post exists:', !!welcomePost);
+    
+    if (welcomePost) {
+        console.log('Welcome post details:', welcomePost);
+    }
+}
+
+// Call this in your initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Add debug call
+    setTimeout(debugPostData, 1000);
+});
