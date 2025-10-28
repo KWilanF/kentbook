@@ -1,6 +1,92 @@
 (function(){
   window.App = window.App || {};
 
+  // Custom styled alert function
+  App.showCaptionAlert = function() {
+    // Remove any existing alert
+    $('.caption-alert').remove();
+    
+    const alertHtml = `
+      <div class="caption-alert" style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 400px;
+        width: 90%;
+        animation: slideInDown 0.3s ease-out;
+        border: 1px solid rgba(255,255,255,0.2);
+      ">
+        <div style="
+          background: rgba(255,255,255,0.2);
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+        ">📝</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Add a caption</div>
+          <div style="font-size: 12px; opacity: 0.9;">Your photo is ready! Write something to share with your friends.</div>
+        </div>
+        <button class="close-alert" style="
+          background: none;
+          border: none;
+          color: white;
+          font-size: 18px;
+          cursor: pointer;
+          opacity: 0.7;
+          padding: 4px;
+          border-radius: 4px;
+        ">×</button>
+      </div>
+    `;
+    
+    $('body').append(alertHtml);
+    
+    // Add CSS animation
+    if (!$('#caption-alert-styles').length) {
+      $('head').append(`
+        <style id="caption-alert-styles">
+          @keyframes slideInDown {
+            from {
+              transform: translateX(-50%) translateY(-100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(-50%) translateY(0);
+              opacity: 1;
+            }
+          }
+          @keyframes pulseWarning {
+            0% { box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 8px 32px rgba(102, 126, 234, 0.8); }
+            100% { box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4); }
+          }
+          .caption-alert {
+            animation: slideInDown 0.3s ease-out, pulseWarning 2s infinite;
+          }
+        </style>
+      `);
+    }
+    
+    // Close button handler
+    $('.close-alert').on('click', function() {
+      $('.caption-alert').remove();
+    });
+  };
+
   App.PostView = Backbone.View.extend({
     tagName: 'article',
     className: 'card post',
@@ -548,6 +634,7 @@
       this.user = opts.user;
       this.imageFile = null;
       this.imageUrl = null;
+      this.captionAlertShown = false;
       
       // Listen for profile picture changes to update composer avatar
       if (typeof ProfilePictureManager !== 'undefined') {
@@ -572,6 +659,12 @@
       textarea.on('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
+        
+        // Check if we should hide the caption alert
+        if (this.value.trim().length > 0 && $('.caption-alert').length) {
+          $('.caption-alert').remove();
+          this.captionAlertShown = false;
+        }
       });
     },
     
@@ -579,8 +672,15 @@
       const text = this.$('textarea').val().trim();
       const postBtn = this.$('.post-btn');
       
-      if (text.length > 0) {
+      // Enable post button if there's text OR if there's an image selected
+      if (text.length > 0 || this.imageFile) {
         postBtn.prop('disabled', false);
+        
+        // Hide caption alert when user starts typing
+        if (text.length > 0 && $('.caption-alert').length) {
+          $('.caption-alert').remove();
+          this.captionAlertShown = false;
+        }
       } else {
         postBtn.prop('disabled', true);
       }
@@ -613,6 +713,16 @@
           <button class="remove-preview">×</button>
         `).show();
         
+        // Enable post button since we have an image now
+        this.$('.post-btn').prop('disabled', false);
+        
+        // Show caption alert if no text is entered
+        const text = this.$('textarea').val().trim();
+        if (!text && !this.captionAlertShown) {
+          App.showCaptionAlert();
+          this.captionAlertShown = true;
+        }
+        
         // Add remove preview handler
         this.$('.remove-preview').on('click', () => {
           this.$('.preview').hide().empty();
@@ -622,6 +732,18 @@
             this.imageUrl = null;
           }
           this.$('#image-upload').val('');
+          
+          // Remove caption alert when image is removed
+          if ($('.caption-alert').length) {
+            $('.caption-alert').remove();
+            this.captionAlertShown = false;
+          }
+          
+          // Check if we should disable post button (no text and no image)
+          const text = this.$('textarea').val().trim();
+          if (!text) {
+            this.$('.post-btn').prop('disabled', true);
+          }
         });
       }
     },
@@ -631,9 +753,19 @@
       
       var body = this.$('textarea').val().trim();
       
-      // Check if body is empty before proceeding
-      if (!body || body.trim().length === 0) {
+      // Check if both body and image are empty
+      if (!body && !this.imageFile) {
+        alert('Please add some text or a photo to post.');
         return;
+      }
+      
+      // If there's an image but no caption, show the alert again
+      if (this.imageFile && !body) {
+        if (!this.captionAlertShown) {
+          App.showCaptionAlert();
+          this.captionAlertShown = true;
+        }
+        return; // Don't proceed with posting
       }
       
       var attrs = { 
@@ -696,12 +828,22 @@
         this.$('#image-upload').val('');
       }
       this.$('.post-btn').prop('disabled', true);
+      
+      // Remove any caption alert
+      if ($('.caption-alert').length) {
+        $('.caption-alert').remove();
+        this.captionAlertShown = false;
+      }
     },
     
     // Clean up object URLs when view is removed
     remove: function() {
       if (this.imageUrl) {
         URL.revokeObjectURL(this.imageUrl);
+      }
+      // Remove any caption alert
+      if ($('.caption-alert').length) {
+        $('.caption-alert').remove();
       }
       $(document).off('profilePictureChanged.composerview');
       return Backbone.View.prototype.remove.call(this);
