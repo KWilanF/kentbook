@@ -406,15 +406,15 @@ function showSignupModal() {
             <div style="border-top: 1px solid #dadde1; margin: 0 -16px 16px;"></div>
             
             <div class="name-fields" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-                <input type="text" id="signupFirstName" placeholder="First name" style="flex: 1; min-width: 120px; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 15px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
-                <input type="text" id="signupLastName" placeholder="Last name" style="flex: 1; min-width: 120px; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 15px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
+                <input type="text" id="signupFirstName" placeholder="First name" style="flex: 1; min-width: 120px; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 14px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
+                <input type="text" id="signupLastName" placeholder="Last name" style="flex: 1; min-width: 120px; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 14px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
             </div>
 
-            <input type="email" id="signupEmail" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 15px; height: 40px; margin-bottom: 10px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
+            <input type="email" id="signupEmail" placeholder="Email address" style="width: 100%; padding: 11px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 14px; height: 40px; margin-bottom: 10px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
             
             <!-- Password field with Facebook-style toggle -->
             <div style="position: relative; margin-bottom: 10px;">
-                <input type="password" id="signupPassword" placeholder="Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 15px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
+                <input type="password" id="signupPassword" placeholder="Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 14px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
                 <button type="button" id="toggleSignupPassword" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #606770; padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" title="Show password">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#606770">
                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -424,7 +424,7 @@ function showSignupModal() {
             
             <!-- Confirm Password field with Facebook-style toggle -->
             <div style="position: relative; margin-bottom: 16px;">
-                <input type="password" id="confirmPassword" placeholder="Confirm Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 15px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" style="width: 100%; padding: 11px 44px 11px 12px; border: 1px solid #ccd0d5; border-radius: 5px; font-size: 14px; height: 40px; box-sizing: border-box; background: #f5f6f7; font-family: inherit;" required />
                 <button type="button" id="toggleConfirmPassword" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #606770; padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" title="Show password">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#606770">
                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -526,7 +526,7 @@ function showSignupModal() {
                 }
                 
                 input {
-                    font-size: 16px !important; /* Prevents zoom on iOS */
+                    font-size: 15px !important; /* Prevents zoom on iOS */
                 }
             }
             
