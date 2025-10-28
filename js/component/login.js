@@ -21,11 +21,15 @@ document.addEventListener("DOMContentLoaded", function () {
   function createNewUser(userData) {
     const users = JSON.parse(localStorage.getItem('kentbook_users') || '[]');
     
-    // New users get default pp.png
+    // New users get default pp.png and complete profile data
     const newUser = {
       ...userData,
       avatar: 'images/pp.png', // Default for new users
-      createdAt: new Date().toISOString()
+      isOnline: true,
+      location: "Manila, Philippines",
+      workplace: "KentBook",
+      education: "University of the Philippines",
+      joinedDate: new Date().toISOString()
     };
     
     users.push(newUser);
@@ -38,7 +42,69 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("✅ Profile picture initialized for new user:", userData.username);
     }
     
+    // Create sample content for new user
+    createSampleContentForNewUser(newUser);
+    
     return newUser;
+  }
+
+  // === FUNCTION: Create sample content for new user ===
+  function createSampleContentForNewUser(user) {
+    try {
+      // Get existing app data
+      const appData = JSON.parse(localStorage.getItem('kentbook_data_v1')) || {
+        users: [],
+        posts: [],
+        comments: []
+      };
+      
+      // Add user to Backbone users if not exists
+      const userExists = appData.users.some(u => u.username === user.username);
+      if (!userExists) {
+        appData.users.push({
+          id: 1, // Simple ID for demo
+          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          avatar: user.avatar,
+          isOnline: true,
+          username: user.username,
+          location: user.location,
+          workplace: user.workplace,
+          education: user.education
+        });
+      }
+      
+      // Add welcome post for new user
+      const welcomePost = {
+        id: 'welcome_post_' + Date.now(),
+        user_id: 1,
+        user_name: user.name,
+        user_username: user.username,
+        body: `Welcome to KentBook, ${user.firstName || user.name}! This is your first post. Feel free to edit or delete it and start sharing with your friends! 🎉`,
+        image: '',
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        created_at: new Date().toISOString(),
+        liked: false,
+        is_profile_post: true
+      };
+      
+      // Check if welcome post already exists
+      const postExists = appData.posts.some(p => p.body && p.body.includes('Welcome to KentBook'));
+      if (!postExists) {
+        appData.posts.push(welcomePost);
+      }
+      
+      // Save updated data
+      localStorage.setItem('kentbook_data_v1', JSON.stringify(appData));
+      console.log("✅ Sample content created for new user:", user.username);
+      
+    } catch (error) {
+      console.error("Error creating sample content:", error);
+    }
   }
 
   // === FUNCTION: Show main app after login ===
@@ -400,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
     signupForm.addEventListener('submit', handleSignup);
   }
 
-  // Handle signup form submission - UPDATED for username generation and profile picture setup
+  // Handle signup form submission - UPDATED with complete user data
   function handleSignup(e) {
     e.preventDefault();
     console.log("=== SIGNUP PROCESS STARTED ===");
@@ -454,20 +520,26 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Create new user object
+    // Create new user object WITH COMPLETE PROFILE DATA
     const userData = {
+      id: Date.now(), // Simple ID generation
       firstName: firstName,
       lastName: lastName,
       name: `${firstName} ${lastName}`,
       email: email,
-      username: username, // Auto-generated from email
+      username: username,
       password: password,
+      avatar: 'images/pp.png',
+      isOnline: true,
+      location: "Manila, Philippines",
+      workplace: "KentBook",
+      education: "University of the Philippines",
       joinedDate: new Date().toISOString()
     };
 
-    console.log("Creating new user:", userData);
+    console.log("Creating new user with complete profile:", userData);
 
-    // Use the createNewUser function to create user with profile picture setup
+    // Use the createNewUser function to create user with profile picture setup and sample content
     const newUser = createNewUser(userData);
 
     // Verify the save worked
@@ -486,6 +558,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (verifyUsers.some(user => user.username === username)) {
       console.log("✅ User successfully saved to localStorage!");
       console.log("✅ Profile picture setup:", profilePictureVerified ? "SUCCESS" : "PENDING");
+      console.log("✅ Sample content created for new user");
       showSignupSuccess();
     } else {
       console.log("❌ Failed to save user");
@@ -502,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div style="background: white; padding: 40px; border-radius: 8px; text-align: center; max-width: 400px;">
         <div style="color: #00a400; font-size: 48px; margin-bottom: 20px;">✓</div>
         <h3 style="color: #1877f2; margin-bottom: 10px;">Account Created Successfully!</h3>
-        <p style="color: #606770; margin-bottom: 20px;">You can now log in with your email address.</p>
+        <p style="color: #606770; margin-bottom: 20px;">Your profile has been set up with sample content. You can now log in with your email address.</p>
         <button id="closeSuccessModal" style="background: #1877f2; color: white; border: none; border-radius: 6px; padding: 12px 24px; font-size: 16px; cursor: pointer;">
           Continue to Login
         </button>

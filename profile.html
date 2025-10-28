@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kent Wilan - KentBook</title>
+  <title id="profileTitle">Kent Wilan - KentBook</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/profile.css">
 </head>
@@ -77,26 +77,26 @@
         </div>
         <div class="profile-photo-section">
           <div class="profile-photo">
-            <img id="profileImage" src="../images/pp.png" alt="Kent Wilan">
+            <img id="profileImage" src="../images/pp.png" alt="User">
             <button class="change-photo-btn" id="changePhotoBtn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M21 6h-3.17l-1.24-1.35A1.99 1.99 0 0 0 15.12 4H8.88c-.56 0-1.1.24-1.48.65L6.17 6H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-9 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
               </svg>
             </button>
           </div>
+          <!-- Updated profile-info section -->
           <div class="profile-info">
             <div class="profile-actions">
               <button class="action-btn primary">Add to Story</button>
               <button class="action-btn secondary">Edit Profile</button>
               <button class="action-btn secondary">...</button>
             </div>
-            <div class="profile-name">Kent Wilan</div>
+            <div class="profile-name" id="profileUserName">Loading...</div>
             <div class="profile-stats">
-              <div>320 friends</div>
-              <div>45 photos</div>
-              <div>15 posts</div>
+              <div id="profileFriendsCount">320 friends</div>
+              <div id="profilePhotosCount">45 photos</div>
+              <div id="profilePostsCount">0 posts</div>
             </div>
-
           </div>
         </div>
       </div>
@@ -115,25 +115,26 @@
 
       <div class="profile-content">
         <div class="profile-left">
+          <!-- Updated intro-card with dynamic data -->
           <div class="intro-card">
             <div class="card-header">Intro</div>
             <div class="intro-item">
               <svg class="intro-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
               </svg>
-              <span>Lives in Manila, Philippines</span>
+              <span id="introLocation">Lives in Manila, Philippines</span>
             </div>
             <div class="intro-item">
               <svg class="intro-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
-              <span>Works at KentBook</span>
+              <span id="introWorkplace">Works at KentBook</span>
             </div>
             <div class="intro-item">
               <svg class="intro-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
-              <span>Studied at University of the Philippines</span>
+              <span id="introEducation">Studied at University of the Philippines</span>
             </div>
             <button class="edit-intro-btn">Edit Details</button>
           </div>
@@ -212,11 +213,11 @@
         </div>
 
         <div class="profile-right">
-          <!-- Create Post -->
+          <!-- Updated Create Post section -->
           <div class="create-post-card">
             <div class="create-post-header">
-              <img id="profileImageSmall" src="../images/pp.png" alt="Kent Wilan">
-              <input type="text" placeholder="What's on your mind, Kent?" class="post-input">
+              <img id="profileImageSmall" src="../images/pp.png" alt="User">
+              <input type="text" placeholder="What's on your mind?" class="post-input">
             </div>
             <div class="create-post-actions">
               <button class="post-action-btn">
@@ -240,96 +241,22 @@
             </div>
           </div>
 
-          <!-- Posts will be displayed here -->
-          <div class="post-card">
-            <div class="post-header">
-              <img src="../images/pp.png" alt="Kent Wilan">
-              <div class="post-user-info">
-                <div class="post-user-name">Kent Wilan</div>
-                <div class="post-time">2 hrs · <svg width="12" height="12" viewBox="0 0 16 16" fill="#65676b"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V8l4 2-4 2v2z"/></svg></div>
+          <!-- Posts will be dynamically loaded here -->
+          <div id="profilePostsContainer">
+            <!-- Dynamic posts will be inserted here by JavaScript -->
+            <div class="post-card" id="loadingPosts">
+              <div class="post-header">
+                <img src="../images/pp.png" alt="User">
+                <div class="post-user-info">
+                  <div class="post-user-name">Loading...</div>
+                  <div class="post-time">Just now</div>
+                </div>
               </div>
-              <button class="post-options-btn">···</button>
-            </div>
-            <div class="post-content">
-              Just finished working on the new KentBook profile page! What do you think? #KentBook #WebDevelopment
-            </div>
-            <div class="post-image">
-              <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Post image">
-            </div>
-            <div class="post-stats">
-              <div class="post-likes">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="#ffffff">
-                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-5.03-2.76a.5.5 0 0 0-.97.24v4a.5.5 0 0 0 .97.24l1-4a.5.5 0 0 0 0-.48l-1-4zM4.5 6.5A.5.5 0 0 0 4 7v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5z"/>
-                </svg>
-                <span>120</span>
+              <div class="post-content" style="text-align: center; padding: 40px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+                <h3 style="margin-bottom: 8px;">Loading posts...</h3>
+                <p style="color: var(--muted);">Please wait while we load your posts</p>
               </div>
-              <div class="post-comments">15 comments · 5 shares</div>
-            </div>
-            <div class="post-actions">
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H3v10h14.43c1.06 0 1.98-.67 2.19-1.61l1.34-6c.31-1.37-.73-2.39-2.19-2.39zM7 20H4v-8h3v8zm12.57-7l-1.34 6H9v-8l4.65-5.97C13.7 4.62 14.06 4.5 14.38 4.5c.28 0 .54.13.73.37l4.41 5.66.01.01.01-.01.02.01-1.99 7.99z"/>
-                </svg>
-                <span>Like</span>
-              </button>
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-                </svg>
-                <span>Comment</span>
-              </button>
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                </svg>
-                <span>Share</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="post-card">
-            <div class="post-header">
-              <img src="../images/profile.png" alt="Kent Wilan">
-              <div class="post-user-info">
-                <div class="post-user-name">Kent Wilan</div>
-                <div class="post-time">1 day ago · <svg width="12" height="12" viewBox="0 0 16 16" fill="#65676b"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V8l4 2-4 2v2z"/></svg></div>
-              </div>
-              <button class="post-options-btn">···</button>
-            </div>
-            <div class="post-content">
-              Beautiful day for hiking! The views were absolutely worth the climb. 🏞️ #Hiking #Nature
-            </div>
-            <div class="post-image">
-              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Post image">
-            </div>
-            <div class="post-stats">
-              <div class="post-likes">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="#ffffff">
-                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-5.03-2.76a.5.5 0 0 0-.97.24v4a.5.5 0 0 0 .97.24l1-4a.5.5 0 0 0 0-.48l-1-4zM4.5 6.5A.5.5 0 0 0 4 7v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0V7a.5.5 0 0 0-.5-.5z"/>
-                </svg>
-                <span>245</span>
-              </div>
-              <div class="post-comments">32 comments · 12 shares</div>
-            </div>
-            <div class="post-actions">
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H3v10h14.43c1.06 0 1.98-.67 2.19-1.61l1.34-6c.31-1.37-.73-2.39-2.19-2.39zM7 20H4v-8h3v8zm12.57-7l-1.34 6H9v-8l4.65-5.97C13.7 4.62 14.06 4.5 14.38 4.5c.28 0 .54.13.73.37l4.41 5.66.01.01.01-.01.02.01-1.99 7.99z"/>
-                </svg>
-                <span>Like</span>
-              </button>
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-                </svg>
-                <span>Comment</span>
-              </button>
-              <button class="post-action">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#65676b">
-                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                </svg>
-                <span>Share</span>
-              </button>
             </div>
           </div>
         </div>
@@ -377,8 +304,7 @@
     </div>
   </div>
 
-
-<script src="../js/component/profileManager.js"></script>
-<script src="../js/component/profile.js"></script>
+  <script src="../js/component/profileManager.js"></script>
+  <script src="../js/component/profile.js"></script>
 </body>
 </html>
