@@ -3,7 +3,7 @@
 
   window.App = window.App || {};
 
-  // Page templates and content (home removed since it's in index.html)
+  // Page templates and content
   App.Pages = {
     friends: `
       <div class="page-content friends-page">
@@ -140,70 +140,55 @@
       </div>
     `,
 
-    groups: `
-      <div class="page-content groups-page">
-        <div class="groups-header">
-          <h1>Groups</h1>
-          <div class="groups-tabs">
-            <button class="tab-btn active" data-tab="your-groups">Your Groups</button>
-            <button class="tab-btn" data-tab="discover">Discover</button>
-            <button class="tab-btn" data-tab="create">Create Group</button>
+    notifications: `
+      <div class="page-content notifications-page">
+        <div class="notifications-header">
+          <h1>Notifications</h1>
+          <div class="notifications-tabs">
+            <button class="tab-btn active" data-tab="all">All Notifications</button>
+            <button class="tab-btn" data-tab="unread">Unread</button>
+            <button class="tab-btn" data-tab="mentions">Mentions</button>
+            <button class="tab-btn" data-tab="reactions">Reactions</button>
           </div>
         </div>
 
-        <div class="groups-content">
-          <div class="groups-main">
-            <div class="groups-list" id="groups-list">
-              <!-- Groups will be populated by JavaScript -->
+        <div class="notifications-list" id="notifications-list">
+          <!-- Notifications will be populated by JavaScript -->
+        </div>
+      </div>
+    `,
+
+    messages: `
+      <div class="page-content messages-page">
+        <div class="messages-header">
+          <h1>Chats</h1>
+          <div class="messages-search">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="#65676b">
+              <path d="M15.7 13.3l-3.8-3.8A5.9 5.9 0 0 0 13 6a6 6 0 1 0-6 6 5.9 5.9 0 0 0 3.5-1.1l3.8 3.8a1 1 0 0 0 1.4 0 1 1 0 0 0 0-1.4zM2 6a4 4 0 1 1 8 0 4 4 0 0 1-8 0z"/>
+            </svg>
+            <input type="text" placeholder="Search messages" />
+          </div>
+        </div>
+
+        <div class="messages-container">
+          <div class="conversations-sidebar">
+            <div class="conversations-list" id="conversations-list">
+              <!-- Conversations will be populated by JavaScript -->
             </div>
           </div>
 
-          <div class="groups-sidebar">
-            <div class="sidebar-section">
-              <h3>Group Events</h3>
-              <div class="events-list">
-                <div class="event-item">
-                  <div class="event-icon">📅</div>
-                  <div class="item-info">
-                    <h4>Tech Meetup</h4>
-                    <p>Tomorrow at 6:00 PM</p>
-                  </div>
-                </div>
-                <div class="event-item">
-                  <div class="event-icon">📅</div>
-                  <div class="item-info">
-                    <h4>Book Club Discussion</h4>
-                    <p>Saturday at 2:00 PM</p>
-                  </div>
-                </div>
-              </div>
+          <div class="chat-area">
+            <div class="empty-chat">
+              <div class="empty-chat-icon">💬</div>
+              <h2>Your Messages</h2>
+              <p>Send private messages to a friend or group.</p>
+              <button class="new-message-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M14 2h-12c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 10h-12v-8h12v8zm-8-6h-4v1h4v-1zm0 2h-4v1h4v-1zm0 2h-4v1h4v-1zm6-4h-4v1h4v-1zm0 2h-4v1h4v-1zm0 2h-4v1h4v-1z"/>
+                </svg>
+                New Message
+              </button>
             </div>
-
-            <div class="sidebar-section">
-              <h3>Suggested Groups</h3>
-              <div class="suggestions-list">
-                <div class="suggestion-item">
-                  <div class="suggestion-avatar">
-                    <img src="https://picsum.photos/100/100?art" alt="Art Lovers">
-                  </div>
-                  <div class="item-info">
-                    <h4>Art Lovers</h4>
-                    <p>25K members</p>
-                  </div>
-                </div>
-                <div class="suggestion-item">
-                  <div class="suggestion-avatar">
-                    <img src="https://picsum.photos/100/100?music" alt="Music Fans">
-                  </div>
-                  <div class="item-info">
-                    <h4>Music Fans</h4>
-                    <p>18K members</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button class="create-group-btn">+ Create New Group</button>
           </div>
         </div>
       </div>
@@ -235,7 +220,7 @@
     // Handle route changes
     handleRoute: function() {
       const hash = window.location.hash.replace('#', '');
-      const validRoutes = ['friends', 'watch', 'marketplace', 'groups'];
+      const validRoutes = ['friends', 'watch', 'marketplace', 'notifications', 'messages'];
       
       if (validRoutes.includes(hash)) {
         this.showPage(hash);
@@ -360,13 +345,16 @@
         case 'marketplace':
           this.initializeMarketplacePage();
           break;
-        case 'groups':
-          this.initializeGroupsPage();
+        case 'notifications':
+          this.initializeNotificationsPage();
+          break;
+        case 'messages':
+          this.initializeMessagesPage();
           break;
       }
     },
 
-    // Initialize Home Page - FIXED VERSION
+    // Initialize Home Page
     initializeHomePage: function() {
       console.log('Initializing home page');
       
@@ -444,20 +432,107 @@
       this.setupCategories();
     },
 
-    // Initialize Groups Page
-    initializeGroupsPage: function() {
-      console.log('Initializing groups page');
-      const groupsData = [
-        { 
-          name: 'Tech Enthusiasts', 
-          members: '15.2K', 
-          privacy: 'Public', 
-          image: 'https://picsum.photos/100/100?tech' 
+    // Initialize Notifications Page
+    initializeNotificationsPage: function() {
+      console.log('Initializing notifications page');
+      const notificationsData = [
+        {
+          id: 1,
+          type: 'reaction',
+          user: {
+            name: 'Alice Cooper',
+            avatar: 'https://randomuser.me/api/portraits/women/33.jpg'
+          },
+          action: 'liked your post',
+          target: 'Your recent photo',
+          time: '5 min ago',
+          unread: true
+        },
+        {
+          id: 2,
+          type: 'friend_request',
+          user: {
+            name: 'Mark Wilson',
+            avatar: 'https://randomuser.me/api/portraits/men/45.jpg'
+          },
+          action: 'sent you a friend request',
+          time: '1 hour ago',
+          unread: true
+        },
+        {
+          id: 3,
+          type: 'comment',
+          user: {
+            name: 'John Davis',
+            avatar: 'https://randomuser.me/api/portraits/men/67.jpg'
+          },
+          action: 'commented on your post',
+          target: '"Great photo!"',
+          time: '3 hours ago',
+          unread: false
+        },
+        {
+          id: 4,
+          type: 'mention',
+          user: {
+            name: 'Emma Roberts',
+            avatar: 'https://randomuser.me/api/portraits/women/68.jpg'
+          },
+          action: 'mentioned you in a comment',
+          target: '@KentWilan check this out!',
+          time: '1 day ago',
+          unread: false
         }
       ];
 
-      this.renderGroups(groupsData);
-      this.setupTabs('.groups-tabs', 'groups-tab');
+      this.renderNotifications(notificationsData);
+      this.setupTabs('.notifications-tabs', 'notifications-tab');
+    },
+
+    // Initialize Messages Page
+    initializeMessagesPage: function() {
+      console.log('Initializing messages page');
+      const conversationsData = [
+        {
+          id: 1,
+          name: "Alice Cooper",
+          avatar: "https://randomuser.me/api/portraits/women/33.jpg",
+          online: true,
+          lastMessage: "Hey! How are you doing?",
+          time: "10:30 AM",
+          unread: 2
+        },
+        {
+          id: 2,
+          name: "Mark Wilson",
+          avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+          online: true,
+          lastMessage: "Let's meet up this weekend!",
+          time: "Yesterday",
+          unread: 0
+        },
+        {
+          id: 3,
+          name: "John Davis",
+          avatar: "https://randomuser.me/api/portraits/men/67.jpg",
+          online: false,
+          lastMessage: "Thanks for helping me with the project!",
+          time: "2 days ago",
+          unread: 0
+        },
+        {
+          id: 4,
+          name: "Emma Roberts",
+          avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+          online: true,
+          lastMessage: "Did you see the new movie?",
+          time: "3 days ago",
+          unread: 1
+        }
+      ];
+
+      this.renderConversations(conversationsData);
+      this.setupMessagesEvents();
     },
 
     // Render methods for different pages
@@ -563,23 +638,183 @@
       `).join('');
     },
 
-    renderGroups: function(groups) {
-      const groupsList = document.getElementById('groups-list');
-      if (!groupsList) {
-        console.error('Groups list not found');
+    renderNotifications: function(notifications) {
+      const notificationsList = document.getElementById('notifications-list');
+      if (!notificationsList) {
+        console.error('Notifications list not found');
         return;
       }
 
-      groupsList.innerHTML = groups.map(group => `
-        <div class="group-card">
-          <img src="${group.image}" alt="${group.name}" class="group-image">
-          <div class="group-info">
-            <h4>${group.name}</h4>
-            <p>${group.members} members • ${group.privacy}</p>
-            <button class="btn-primary">Join Group</button>
+      notificationsList.innerHTML = notifications.map(notification => `
+        <div class="notification-item ${notification.unread ? 'unread' : ''}">
+          <img src="${notification.user.avatar}" alt="${notification.user.name}" class="notification-avatar">
+          <div class="notification-content">
+            <div class="notification-text">
+              <strong>${notification.user.name}</strong> ${notification.action}
+              ${notification.target ? `<span class="notification-target">${notification.target}</span>` : ''}
+            </div>
+            <div class="notification-time">${notification.time}</div>
           </div>
+          ${notification.unread ? '<div class="unread-dot"></div>' : ''}
         </div>
       `).join('');
+    },
+
+    renderConversations: function(conversations) {
+      const conversationsList = document.getElementById('conversations-list');
+      if (!conversationsList) {
+        console.error('Conversations list not found');
+        return;
+      }
+
+      conversationsList.innerHTML = conversations.map(conv => `
+        <div class="conversation-item" data-conversation-id="${conv.id}">
+          <div class="conversation-avatar-wrapper">
+            <img src="${conv.avatar}" alt="${conv.name}" class="conversation-avatar">
+            ${conv.online ? '<span class="online-status"></span>' : ''}
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <span class="conversation-name">${conv.name}</span>
+              <span class="conversation-time">${conv.time}</span>
+            </div>
+            <div class="conversation-preview">${conv.lastMessage}</div>
+          </div>
+          ${conv.unread > 0 ? `<div class="unread-badge">${conv.unread}</div>` : ''}
+        </div>
+      `).join('');
+    },
+
+    // Setup messages events
+    setupMessagesEvents: function() {
+      const conversationItems = document.querySelectorAll('.conversation-item');
+      const newMessageBtn = document.querySelector('.new-message-btn');
+
+      conversationItems.forEach(item => {
+        item.addEventListener('click', function() {
+          // Remove active class from all items
+          conversationItems.forEach(i => i.classList.remove('active'));
+          // Add active class to clicked item
+          this.classList.add('active');
+          
+          const conversationId = this.getAttribute('data-conversation-id');
+          this.openChat(conversationId);
+        });
+      });
+
+      if (newMessageBtn) {
+        newMessageBtn.addEventListener('click', function() {
+          alert('New message feature would open a friend list to select from');
+        });
+      }
+    },
+
+    // Open chat function
+    openChat: function(conversationId) {
+      const chatArea = document.querySelector('.chat-area');
+      const conversations = [
+        {
+          id: 1,
+          name: "Alice Cooper",
+          avatar: "https://randomuser.me/api/portraits/women/33.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Hey there! 👋", time: "10:25 AM", sent: false },
+            { id: 2, text: "How's your day going?", time: "10:26 AM", sent: false },
+            { id: 3, text: "Pretty good! Just working on some projects. How about you?", time: "10:28 AM", sent: true }
+          ]
+        },
+        {
+          id: 2,
+          name: "Mark Wilson",
+          avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+          online: true,
+          messages: [
+            { id: 1, text: "Are we still on for Saturday?", time: "Yesterday", sent: true },
+            { id: 2, text: "Yes! Looking forward to it. 7 PM at the usual place?", time: "Yesterday", sent: false }
+          ]
+        }
+      ];
+
+      const conversation = conversations.find(conv => conv.id === parseInt(conversationId));
+      if (!conversation) return;
+
+      chatArea.innerHTML = `
+        <div class="chat-header">
+          <img src="${conversation.avatar}" alt="${conversation.name}" class="chat-avatar">
+          <div class="chat-header-info">
+            <div class="chat-header-name">${conversation.name}</div>
+            <div class="chat-header-status">${conversation.online ? 'Online' : 'Last seen recently'}</div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="chat-header-btn" title="Video call">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2 6c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm14 0H4v8h12V6zM8 7l5 3-5 3V7z"/>
+              </svg>
+            </button>
+            <button class="chat-header-btn" title="Audio call">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2a6 6 0 0 0-6 6v3.5l-2 2v1h16v-1l-2-2V8a6 6 0 0 0-6-6zm0 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="messages-area">
+          ${conversation.messages.map(msg => `
+            <div class="message ${msg.sent ? 'sent' : 'received'}">
+              <div class="message-text">${msg.text}</div>
+              <div class="message-time">${msg.time}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="message-input-area">
+          <div class="message-input-wrapper">
+            <button class="message-action-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13zM7 8.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-7 5h8v1H6v-1z"/>
+              </svg>
+            </button>
+            <input type="text" class="message-input" placeholder="Type a message...">
+            <button class="send-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2 10l5 5 11-11-1.5-1.5L7 12 3.5 8.5 2 10z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Add event listener for sending messages
+      const messageInput = chatArea.querySelector('.message-input');
+      const sendBtn = chatArea.querySelector('.send-btn');
+
+      if (messageInput && sendBtn) {
+        const sendMessage = () => {
+          const text = messageInput.value.trim();
+          if (text) {
+            const messagesArea = chatArea.querySelector('.messages-area');
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageHTML = `
+              <div class="message sent">
+                <div class="message-text">${text}</div>
+                <div class="message-time">${currentTime}</div>
+              </div>
+            `;
+            
+            messagesArea.innerHTML += messageHTML;
+            messageInput.value = '';
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+          }
+        };
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        });
+      }
     },
 
     // Setup tabs for different pages
@@ -614,17 +849,10 @@
       console.log(`${type} tab changed to:`, tab);
     },
 
-    // Bind navigation buttons - KEEP MESSAGES REDIRECT
+    // Bind navigation buttons - REMOVED MESSAGES REDIRECT
     bindNavigationButtons: function() {
-      // Messages button - redirect to message.html (keep as you want)
-      const messagesButton = document.querySelector('button[title="Messages"]');
-      if (messagesButton) {
-        messagesButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          console.log('Messages button clicked, redirecting to message.html');
-          window.location.href = 'message.html';
-        });
-      }
+      // Messages button now handled by the router
+      // No need for special handling since it's integrated like other pages
     },
 
     // Bind menu button for dropdown
@@ -740,7 +968,8 @@
         { selector: '.center-icons .icon-btn[data-route="friends"]', route: 'friends' },
         { selector: '.center-icons .icon-btn[data-route="watch"]', route: 'watch' },
         { selector: '.center-icons .icon-btn[data-route="marketplace"]', route: 'marketplace' },
-        { selector: '.center-icons .icon-btn[data-route="groups"]', route: 'groups' }
+        { selector: '.center-icons .icon-btn[data-route="notifications"]', route: 'notifications' },
+        { selector: '.center-icons .icon-btn[data-route="messages"]', route: 'messages' }
       ];
 
       routes.forEach(link => {
@@ -775,8 +1004,9 @@
       const sidebarRoutes = [
         { selector: '.left-sidebar li[data-route="friends"]', route: 'friends' },
         { selector: '.left-sidebar li[data-route="watch"]', route: 'watch' },
-        { selector: '.left-sidebar li[data-route="groups"]', route: 'groups' },
-        { selector: '.left-sidebar li[data-route="marketplace"]', route: 'marketplace' }
+        { selector: '.left-sidebar li[data-route="notifications"]', route: 'notifications' },
+        { selector: '.left-sidebar li[data-route="marketplace"]', route: 'marketplace' },
+        { selector: '.left-sidebar li[data-route="messages"]', route: 'messages' }
       ];
 
       sidebarRoutes.forEach(link => {
